@@ -1,7 +1,6 @@
 """Tests for configuration module."""
 
 import os
-from unittest.mock import patch
 from src.config import (
     Config,
     DevelopmentConfig,
@@ -52,11 +51,11 @@ class TestConfig:
         """Test DEBUG setting can be controlled by environment variable."""
         # Test the logic of the DEBUG setting
         # Since DEBUG is evaluated at class definition time, we test the logic directly
-        
+
         # Test the conversion logic used in Config class
         def debug_from_env(env_value):
             return env_value.lower() == "true" if env_value else False
-        
+
         assert debug_from_env("true") is True
         assert debug_from_env("True") is True
         assert debug_from_env("TRUE") is True
