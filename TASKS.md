@@ -24,31 +24,31 @@
 
 **DoD** ✅ : app démarre localement (`GET /` → 200, `/health` → JSON), lint OK (black+ruff).
 
-## M1 — Génération (6h détaillé)
-### Backend API (3h)
-- [ ] Route `POST /api/generate` avec validation (1h) [dépend: M0.routes]
+## M1 — Génération (6h détaillé) ✅ COMPLETED
+### Backend API (3h) ✅
+- [x] Route `POST /api/generate` avec validation (1h) [dépend: M0.routes]
   - Support JSON `{diagram_type, output_format, diagram_source}`
-  - Support `text/plain` + query params
+  - Support `text/plain` + query params  
   - Schema validation + erreurs 400
-- [ ] Client HTTP vers Kroki (2h) [dépend: M0.config]
+- [x] Client HTTP vers Kroki (2h) [dépend: M0.config]
   - Headers `Content-Type: text/plain`, `Accept: image/*`
   - Gestion timeout + retry simple
   - Gestion payload volumineux → fichier temporaire si > MAX_BYTES
 
-### Frontend (2h)
-- [ ] UI affichage résultat image (1h) [dépend: backend]
-  - Preview image inline
+### Frontend (2h) ✅
+- [x] UI affichage résultat image (1h) [dépend: backend]
+  - Preview image inline (déjà implémenté en M0)
   - Gestion erreurs visuelles
-- [ ] Bouton téléchargement avec nom fichier (0.5h)
-- [ ] Messages d'erreur UX clairs (0.5h)
+- [x] Bouton téléchargement avec nom fichier (0.5h)
+- [x] Messages d'erreur UX clairs (0.5h)
   - Type/format invalide
   - Timeout Kroki
   - Erreurs 5xx avec détails
 
-### Validation (1h)
-- [ ] Tests unitaires routes + client HTTP (1h)
+### Validation (1h) ✅
+- [x] Tests unitaires routes + client HTTP (1h)
 
-**DoD** : MVP 3 types (Mermaid, PlantUML, Graphviz) → PNG/SVG OK ; erreurs UX lisibles.
+**DoD** ✅ : MVP 3 types (Mermaid, PlantUML, Graphviz) → PNG/SVG OK ; erreurs UX lisibles.
 
 ## M2 — Dockerisation (3h détaillé)
 ### Conteneurisation (2h)

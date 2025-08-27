@@ -53,3 +53,7 @@ Currently no dependencies are specified in pyproject.toml. Dependencies should b
 - Add new modules under the `src/` directory
 - Update pyproject.toml when adding dependencies
 - Use the existing project structure for consistency
+
+## Claude comportment
+- quand tu finis une tâche, penses à mettre à jour le fichier TASKS.md
+- prépare un message de commit clair et concis
