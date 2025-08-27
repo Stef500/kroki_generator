@@ -71,14 +71,21 @@
 
 **DoD** ✅ : `docker compose up --build` → UI `:8080` + génération E2E + healthcheck OK.
 
-## M3 — Qualité & Tests (4h détaillé)
-### Documentation (4h)
-- [ ] README complet (1h)
+## M3 — Qualité & Tests (4h détaillé) 🔄 IN PROGRESS
+### Documentation (2h) ✅ COMPLETED
+- [x] README complet (1h) ✅
   - Setup local + Docker
   - Usage UI + API
   - Config variables
-- [ ] Docstring + type hints (1h)
-- [ ] Exemples curl (0.5h)
+  - Troubleshooting & architecture
+- [x] Docstring + type hints (1h) ✅
+  - Docstrings détaillées en français pour tous les modules
+  - Type hints complets avec typing.Optional, Tuple, etc.
+  - Documentation des paramètres et valeurs de retour
+- [x] Exemples curl (0.5h) ✅
+  - API_EXAMPLES.md avec exemples complets
+  - Tests de différents formats et cas d'erreur
+  - Scripts batch et cas d'utilisation avancés
 
 ### Tests automatisés (2.5h)
 - [ ] Tests unitaires complets ≥80% coverage (1.5h) [dépend: M1]

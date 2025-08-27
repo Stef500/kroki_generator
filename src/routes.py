@@ -1,6 +1,11 @@
-"""Route definitions for the Flask application."""
+"""Route definitions for the Flask application.
+
+This module contains all HTTP route handlers for the Kroki diagram generation
+web application, including the main UI, health checks, and API endpoints.
+"""
 
 from flask import Blueprint, render_template, jsonify, request, Response
+from typing import Dict, Any, Tuple, Union
 from src.kroki_client import KrokiClient, KrokiError
 import logging
 
@@ -9,14 +14,41 @@ logger = logging.getLogger(__name__)
 
 
 @main_bp.route("/")
-def index():
-    """Main page with diagram generation form."""
+def index() -> str:
+    """Render main page with diagram generation form.
+    
+    Returns:
+        str: Rendered HTML template for the main UI page
+    """
     return render_template("index.html")
 
 
 @main_bp.route("/health")
-def health():
-    """Advanced health check endpoint with Kroki connectivity."""
+def health() -> Tuple[Dict[str, Any], int]:
+    """Advanced health check endpoint with Kroki connectivity.
+    
+    Performs comprehensive health checks including:
+    - Service availability
+    - Kroki service connectivity and response time
+    - System status assessment
+    
+    Returns:
+        Tuple[Dict[str, Any], int]: Health status JSON and HTTP status code
+        - 200: All systems healthy
+        - 503: Degraded service or unhealthy dependencies
+        
+    Response Format:
+        {
+            "service": "kroki-flask-generator",
+            "version": "0.1.0", 
+            "timestamp": "2024-01-15T10:30:00Z",
+            "status": "healthy|degraded|unhealthy",
+            "checks": {
+                "service": {"status": "healthy", "message": "..."},
+                "kroki": {"status": "healthy", "message": "...", "response_time_ms": 45}
+            }
+        }
+    """
     from flask import current_app
     import requests
     from datetime import datetime
@@ -83,8 +115,44 @@ def health():
 
 
 @main_bp.route("/api/generate", methods=["POST"])
-def generate_diagram():
-    """Generate diagram via Kroki API."""
+def generate_diagram() -> Union[Response, Tuple[Dict[str, str], int]]:
+    """Generate diagram via Kroki API.
+    
+    Supports both JSON and text/plain request formats for flexible usage.
+    Validates input parameters, generates diagrams through Kroki service,
+    and returns binary image data with appropriate content type.
+    
+    Request Formats:
+        JSON (application/json):
+            {
+                "diagram_type": "mermaid|plantuml|graphviz",
+                "output_format": "png|svg", 
+                "diagram_source": "diagram source code",
+                "diagram_theme": "default|light|dark|neutral|forest" (optional)
+            }
+            
+        Text (text/plain + query params):
+            POST /api/generate?diagram_type=mermaid&output_format=png
+            Body: raw diagram source code
+    
+    Returns:
+        Union[Response, Tuple[Dict[str, str], int]]: 
+            - Success: Binary image data with appropriate MIME type
+            - Error: JSON error response with HTTP status code
+            
+    Response Headers:
+        Content-Type: image/png, image/svg+xml
+        Content-Disposition: inline; filename=diagram.{format}
+        Cache-Control: no-cache, no-store, must-revalidate
+        
+    Status Codes:
+        200: Diagram generated successfully
+        400: Invalid request data or diagram syntax error
+        500: Internal server error
+        
+    Raises:
+        KrokiError: Diagram generation failures from Kroki service
+    """
     logger.info(f"Received request: Content-Type={request.content_type}")
     try:
         # Parse request data
