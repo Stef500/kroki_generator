@@ -45,3 +45,12 @@ docker-down: ## Stop Docker Compose
 
 health: ## Check application health
 	curl -f http://localhost:5000/health || echo "Service not running"
+
+docker-test: ## Run Docker integration tests
+	./scripts/test-docker.sh
+
+integration-test: ## Run integration tests only (requires running services)
+	pytest tests/test_integration.py -v -m integration
+
+smoke-test: ## Quick smoke test of running services
+	pytest tests/test_integration.py -v -k "not integration"

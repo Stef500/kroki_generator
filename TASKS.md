@@ -50,36 +50,45 @@
 
 **DoD** ✅ : MVP 3 types (Mermaid, PlantUML, Graphviz) → PNG/SVG OK ; erreurs UX lisibles.
 
-## M2 — Dockerisation (3h détaillé)
-### Conteneurisation (2h)
-- [ ] `Dockerfile` production avec gunicorn (1h) [dépend: M1.backend]
-  - Multi-stage build optimisé
-  - User non-root
-  - COPY optimisé (layers)
-- [ ] `docker-compose.yml` stack complète (1h)
+## M2 — Dockerisation (3h détaillé) ✅ COMPLETED
+### Conteneurisation (2h) ✅
+- [x] `Dockerfile` production avec gunicorn (1h) [dépend: M1.backend]
+  - Multi-stage build optimisé (builder + production)
+  - User non-root (appuser)
+  - COPY optimisé (layers) + .dockerignore
+- [x] `docker-compose.yml` stack complète (1h)
   - Service app + kroki + mermaid
   - Networks et volumes appropriés
-  - Variables d'environnement
+  - Variables d'environnement + healthchecks
 
-### Robustesse (1h) 
-- [ ] Healthcheck avancé `/health` endpoint (0.5h)
-  - Vérification connectivité Kroki
-  - Status JSON avec détails
-- [ ] Tests intégration Docker (0.5h) [dépend: compose]
-  - Smoke test génération via container
+### Robustesse (1h) ✅ 
+- [x] Healthcheck avancé `/health` endpoint (0.5h)
+  - Vérification connectivité Kroki + response time
+  - Status JSON avec détails (healthy/degraded)
+- [x] Tests intégration Docker (0.5h) [dépend: compose]
+  - Smoke test + E2E génération via container
+  - Script `./scripts/test-docker.sh` automatisé
 
-**DoD** : `docker compose up --build` → UI `:8080` + génération E2E + healthcheck OK.
+**DoD** ✅ : `docker compose up --build` → UI `:8080` + génération E2E + healthcheck OK.
 
 ## M3 — Qualité & Tests (4h détaillé)
 ### Tests automatisés (2.5h)
 - [ ] Tests unitaires complets ≥80% coverage (1.5h) [dépend: M1]
   - Routes + validation
   - Client HTTP + mocks  
-  - Gestion erreurs
+  - Gestion erreurs (dont logging)
 - [ ] Tests intégration marqués `integration` (1h) [dépend: M2]
   - E2E via docker-compose
   - Performance (payload large)
   - Robustesse (Kroki down)
+
+### Documentation (4h)
+- [ ] README complet (1h)
+  - Setup local + Docker
+  - Usage UI + API
+  - Config variables
+- [ ] Docstring + type hints (1h)
+- [ ] Exemples curl (0.5h)
 
 ### Qualité code (1.5h)
 - [ ] Pre-commit hooks (black, ruff, pytest) (0.5h)
@@ -87,6 +96,7 @@
   - Lint + unit tests
   - Integration tests (optionnel)
   - Coverage reporting
+  - Push to Docker Hub (optionnel)
 
 **DoD** : Pipeline CI vert + `pytest -m "integration"` passe + coverage ≥80%.
 

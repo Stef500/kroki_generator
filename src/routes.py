@@ -16,10 +16,70 @@ def index():
 
 @main_bp.route("/health")
 def health():
-    """Health check endpoint."""
-    return jsonify(
-        {"status": "healthy", "service": "kroki-flask-generator", "version": "0.1.0"}
-    )
+    """Advanced health check endpoint with Kroki connectivity."""
+    from flask import current_app
+    import requests
+    from datetime import datetime
+
+    health_status = {
+        "service": "kroki-flask-generator",
+        "version": "0.1.0",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "status": "healthy",
+        "checks": {},
+    }
+
+    # Check basic service health
+    health_status["checks"]["service"] = {
+        "status": "healthy",
+        "message": "Flask service running",
+    }
+
+    # Check Kroki connectivity
+    try:
+        kroki_url = current_app.config.get("KROKI_URL", "http://localhost:8000")
+        timeout = min(
+            current_app.config.get("REQUEST_TIMEOUT", 10), 5
+        )  # Max 5s for health check
+
+        response = requests.get(f"{kroki_url}/health", timeout=timeout)
+        if response.status_code == 200:
+            health_status["checks"]["kroki"] = {
+                "status": "healthy",
+                "message": f"Kroki service accessible at {kroki_url}",
+                "response_time_ms": int(response.elapsed.total_seconds() * 1000),
+            }
+        else:
+            health_status["checks"]["kroki"] = {
+                "status": "degraded",
+                "message": f"Kroki service returned status {response.status_code}",
+            }
+            health_status["status"] = "degraded"
+
+    except requests.exceptions.Timeout:
+        health_status["checks"]["kroki"] = {
+            "status": "unhealthy",
+            "message": "Kroki service timeout",
+        }
+        health_status["status"] = "degraded"
+
+    except requests.exceptions.ConnectionError:
+        health_status["checks"]["kroki"] = {
+            "status": "unhealthy",
+            "message": "Cannot connect to Kroki service",
+        }
+        health_status["status"] = "degraded"
+
+    except Exception as e:
+        health_status["checks"]["kroki"] = {
+            "status": "unhealthy",
+            "message": f"Kroki health check failed: {str(e)}",
+        }
+        health_status["status"] = "degraded"
+
+    # Return appropriate HTTP status
+    status_code = 200 if health_status["status"] == "healthy" else 503
+    return jsonify(health_status), status_code
 
 
 @main_bp.route("/api/generate", methods=["POST"])
