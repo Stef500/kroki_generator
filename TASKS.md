@@ -1,27 +1,28 @@
 # TASKS — Jalons & tâches
 
-## M0 — Scaffold (4h détaillé)
-### Structure projet (1.5h)
-- [ ] Créer repo + structure (`src/`, `tests/`, `pyproject.toml`) (0.5h)
-- [ ] Setup `requirements.txt` avec Flask, requests, pytest (0.5h) 
-- [ ] Configuration `.env` template + loader (0.5h)
+## M0 — Scaffold (4h détaillé) ✅ COMPLETED
+### Structure projet (1.5h) ✅
+- [x] Créer repo + structure (`src/`, `tests/`, `pyproject.toml`) (0.5h)
+- [x] Setup dependencies avec Flask, requests, pytest dans `pyproject.toml` (0.5h) 
+- [x] Configuration `.env.template` + loader dans `src/config.py` (0.5h)
   - `KROKI_URL=http://localhost:8000`
   - `REQUEST_TIMEOUT=10`
   - `MAX_BYTES=1000000`
 
-### App Flask minimale (2h)
-- [ ] Bootstrap Flask (`wsgi.py`, `src/app.py`) (0.5h) [dépend: structure]
-- [ ] Routes de base (`src/routes.py`) (0.5h) [dépend: bootstrap]
-- [ ] Page HTML template avec form (1h) [dépend: routes]
+### App Flask minimale (2h) ✅
+- [x] Bootstrap Flask (`wsgi.py`, `src/main.py`) (0.5h) [dépend: structure]
+- [x] Routes de base (`src/routes.py`) avec blueprint (0.5h) [dépend: bootstrap]
+- [x] Page HTML template avec form Bootstrap 5 (1h) [dépend: routes]
   - Textarea pour diagramme
   - Select diagram_type (Mermaid, PlantUML, Graphviz)
   - Select output_format (PNG, SVG)
-  - Bouton "Générer"
+  - Bouton "Générer" + JavaScript frontend
+  - Exemples intégrés + UI complète
 
-### Outillage (0.5h)
-- [ ] Makefile avec targets `run`, `test`, `lint` (0.5h)
+### Outillage (0.5h) ✅
+- [x] Makefile avec targets `run`, `test`, `lint`, `format`, `docker-*` (0.5h)
 
-**DoD** : app démarre localement (`GET /` OK), lint OK.
+**DoD** ✅ : app démarre localement (`GET /` → 200, `/health` → JSON), lint OK (black+ruff).
 
 ## M1 — Génération (6h détaillé)
 ### Backend API (3h)

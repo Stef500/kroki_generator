@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Create Diagram</h5>
+            </div>
+            <div class="card-body">
+                <form id="diagramForm">
+                    <div class="mb-3">
+                        <label for="diagram_type" class="form-label">Diagram Type</label>
+                        <select class="form-select" id="diagram_type" name="diagram_type" required>
+                            <option value="">Select diagram type...</option>
+                            <option value="mermaid">Mermaid</option>
+                            <option value="plantuml">PlantUML</option>
+                            <option value="graphviz">Graphviz</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="output_format" class="form-label">Output Format</label>
+                        <select class="form-select" id="output_format" name="output_format" required>
+                            <option value="">Select output format...</option>
+                            <option value="png">PNG</option>
+                            <option value="svg">SVG</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="diagram_source" class="form-label">Diagram Source</label>
+                        <textarea class="form-control" id="diagram_source" name="diagram_source" 
+                                  rows="10" placeholder="Enter your diagram source code here..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                        Generate Diagram
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Result</h5>
+                <button id="downloadBtn" class="btn btn-sm btn-success" style="display: none;">
+                    Download
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="result" class="diagram-output">
+                    <p class="text-muted">Generated diagram will appear here</p>
+                </div>
+                <div id="error" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Examples</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>Mermaid</h6>
+                        <pre class="bg-light p-2 small"><code>graph TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]</code></pre>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>PlantUML</h6>
+                        <pre class="bg-light p-2 small"><code>@startuml
+Alice -> Bob: Hello
+Bob -> Alice: Hi there!
+@enduml</code></pre>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Graphviz</h6>
+                        <pre class="bg-light p-2 small"><code>digraph G {
+    A -> B -> C;
+    B -> D;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('diagramForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const loading = submitBtn.querySelector('.loading');
+    const result = document.getElementById('result');
+    const error = document.getElementById('error');
+    const downloadBtn = document.getElementById('downloadBtn');
+    
+    // Show loading state
+    loading.style.display = 'inline-block';
+    submitBtn.disabled = true;
+    error.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    
+    try {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to generate diagram');
+        }
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        // Display result
+        if (data.output_format === 'svg') {
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxWidth = '100%';
+            result.innerHTML = '';
+            result.appendChild(img);
+        } else {
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxWidth = '100%';
+            result.innerHTML = '';
+            result.appendChild(img);
+        }
+        
+        // Setup download
+        downloadBtn.style.display = 'inline-block';
+        downloadBtn.onclick = function() {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `diagram.${data.output_format}`;
+            a.click();
+        };
+        
+    } catch (err) {
+        error.textContent = err.message;
+        error.style.display = 'block';
+        result.innerHTML = '<p class="text-muted">Generated diagram will appear here</p>';
+    } finally {
+        loading.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+});
+</script>
+{% endblock %}

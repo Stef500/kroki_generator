@@ -3,4 +3,21 @@ name = "create-graph"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "Flask>=3.0.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "gunicorn>=21.2.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "requests-mock>=1.11.0"
+]
+dev = [
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.4.0"
+]
