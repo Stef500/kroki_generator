@@ -1,55 +1,32 @@
-.PHONY: help install run test lint clean dev-install kroki-start kroki-stop dev dev-stop
+.PHONY: help install dev run test lint format docker docker-stop clean check
 
 help: ## Show this help message
 	@echo 'Usage: make <target>'
 	@echo ''
-	@echo 'Targets:'
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo 'Development:'
+	@echo '  install    Install dependencies (dev + test)'
+	@echo '  dev        Start everything for development (Flask + Kroki)'
+	@echo '  run        Run Flask only (requires Kroki separately)'
+	@echo ''
+	@echo 'Quality:'
+	@echo '  test       Run all tests with coverage'
+	@echo '  lint       Check code quality'
+	@echo '  format     Auto-format code'
+	@echo ''
+	@echo 'Production:'
+	@echo '  docker     Run production with Docker Compose'
+	@echo '  docker-stop Stop Docker services'
+	@echo ''
+	@echo 'Utils:'
+	@echo '  clean      Clean temporary files'
+	@echo '  check      Health check'
 
-install: ## Install production dependencies
-	uv pip install -e .
+# === DÉVELOPPEMENT ===
 
-dev-install: ## Install development dependencies
+install: ## Install dependencies (dev + test)
 	uv pip install -e .[test,dev]
 
-run: ## Run the Flask development server
-	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
-
-test: ## Run tests with coverage
-	pytest tests/ -v --cov=src --cov-report=term-missing
-
-lint: ## Run code quality checks
-	black --check src tests
-	ruff check src tests
-
-format: ## Format code with black and ruff
-	black src tests
-	ruff check --fix src tests
-
-clean: ## Clean up temporary files
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pyo" -delete
-	find . -type f -name "*.pyd" -delete
-	find . -type f -name ".coverage" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} +
-
-docker-build: ## Build Docker image
-	docker build -t kroki-flask-generator .
-
-docker-run: ## Run with Docker Compose
-	docker compose up --build
-
-docker-down: ## Stop Docker Compose
-	docker compose down
-
-kroki-start: ## Start only Kroki services in background
-	docker compose up -d kroki mermaid
-
-kroki-stop: ## Stop Kroki services
-	docker compose stop kroki mermaid
-
-dev: ## Start Kroki and run Flask app for development
+dev: ## Start everything for development (Flask + Kroki)
 	@echo "Starting Kroki services..."
 	docker compose up -d kroki mermaid
 	@echo "Waiting for Kroki to be ready..."
@@ -57,18 +34,39 @@ dev: ## Start Kroki and run Flask app for development
 	@echo "Starting Flask application..."
 	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
 
-dev-stop: ## Stop all development services
-	docker compose stop kroki mermaid
-	@echo "Kroki services stopped. Press Ctrl+C to stop Flask if running."
+run: ## Run Flask only (requires Kroki separately)
+	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
 
-health: ## Check application health
+# === QUALITÉ ===
+
+test: ## Run all tests with coverage
+	pytest tests/ -v --cov=src --cov-report=term-missing
+
+lint: ## Check code quality
+	black --check src tests
+	ruff check src tests
+
+format: ## Auto-format code
+	black src tests
+	ruff check --fix src tests
+
+# === PRODUCTION ===
+
+docker: ## Run production with Docker Compose
+	docker compose up --build
+
+docker-stop: ## Stop Docker services
+	docker compose down
+
+# === UTILS ===
+
+clean: ## Clean temporary files
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+	find . -type f -name "*.pyd" -delete
+	find . -type f -name ".coverage" -delete
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+
+check: ## Health check
 	curl -f http://localhost:5001/health || echo "Service not running"
-
-docker-test: ## Run Docker integration tests
-	./scripts/test-docker.sh
-
-integration-test: ## Run integration tests only (requires running services)
-	pytest tests/test_integration.py -v -m integration
-
-smoke-test: ## Quick smoke test of running services
-	pytest tests/test_integration.py -v -k "not integration"
