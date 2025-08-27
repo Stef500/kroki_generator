@@ -86,7 +86,8 @@ class TestKrokiClient:
     def test_generate_diagram_connection_error(self, requests_mock):
         """Test connection error handling."""
         requests_mock.post(
-            "http://test-kroki:8000/mermaid/png", exc=requests.exceptions.ConnectionError
+            "http://test-kroki:8000/mermaid/png",
+            exc=requests.exceptions.ConnectionError,
         )
 
         with pytest.raises(KrokiError, match="Connection error"):
@@ -95,9 +96,7 @@ class TestKrokiClient:
     def test_generate_diagram_success_svg(self, requests_mock):
         """Test successful SVG diagram generation."""
         mock_svg_data = b"<svg>fake svg</svg>"
-        requests_mock.post(
-            "http://test-kroki:8000/graphviz/svg", content=mock_svg_data
-        )
+        requests_mock.post("http://test-kroki:8000/graphviz/svg", content=mock_svg_data)
 
         result_data, content_type = self.client.generate_diagram(
             "graphviz", "svg", "digraph G { A -> B }"
@@ -111,14 +110,14 @@ class TestKrokiClient:
         """Test large payload handling with temporary files."""
         # Create a client with very small max_bytes to trigger temp file path
         small_client = KrokiClient("http://test-kroki:8000", timeout=5, max_bytes=10)
-        
+
         mock_image_data = b"fake-image-data"
         requests_mock.post(
             "http://test-kroki:8000/mermaid/png", content=mock_image_data
         )
 
         large_diagram = "graph TD\n" + "A --> B\n" * 100  # Large diagram source
-        
+
         result_data, content_type = small_client.generate_diagram(
             "mermaid", "png", large_diagram
         )
@@ -133,8 +132,8 @@ class TestKrokiClient:
         for diagram_type in valid_types:
             # Should not raise exception
             self.client._validate_inputs(diagram_type, "png", "test")
-        
-        # Test valid output formats  
+
+        # Test valid output formats
         valid_formats = ["png", "svg"]
         for output_format in valid_formats:
             # Should not raise exception

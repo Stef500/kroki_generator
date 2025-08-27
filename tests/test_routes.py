@@ -41,7 +41,7 @@ class TestRoutes:
     def test_health_route(self, client):
         """Test health check route."""
         response = client.get("/health")
-        
+
         # Health endpoint should return either 200 (healthy) or 503 (degraded)
         assert response.status_code in [200, 503]
 
@@ -51,7 +51,7 @@ class TestRoutes:
         assert data["status"] in ["healthy", "degraded"]
         assert "checks" in data
         assert "service" in data["checks"]
-        
+
         # In test environment, Kroki might not be available, so status can be degraded
         if response.status_code == 503:
             assert data["status"] == "degraded"

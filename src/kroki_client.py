@@ -1,6 +1,6 @@
 """Kroki HTTP client for diagram generation.
 
-Ce module fournit un client HTTP robuste pour interagir avec le service 
+Ce module fournit un client HTTP robuste pour interagir avec le service
 de génération de diagrammes Kroki, supportant plusieurs types de diagrammes,
 formats de sortie et fonctionnalités avancées comme les thèmes.
 """
@@ -13,50 +13,51 @@ from flask import current_app
 
 class KrokiError(Exception):
     """Exception levée pour les erreurs liées à Kroki.
-    
+
     Classe d'exception personnalisée pour gérer les différentes erreurs
     qui peuvent survenir lors de la génération de diagrammes, incluant
     les problèmes réseau, syntaxe invalide et échecs de service.
     """
+
     pass
 
 
 class KrokiClient:
     """Client HTTP pour le service Kroki.
-    
+
     Fournit une interface haut niveau pour générer des diagrammes via
     le service Kroki avec support pour plusieurs types de diagrammes,
     formats de sortie, thèmes et gestion d'erreurs robuste.
-    
+
     Attributes:
         base_url (str): URL du point de terminaison Kroki
-        timeout (int): Délai d'expiration des requêtes HTTP en secondes  
+        timeout (int): Délai d'expiration des requêtes HTTP en secondes
         max_bytes (int): Taille max du source avant utilisation de fichiers temporaires
-        
+
     Types de diagrammes supportés:
         - mermaid: Organigrammes, diagrammes de séquence, diagrammes de Gantt
         - plantuml: Diagrammes UML, diagrammes de séquence, diagrammes de classe
         - graphviz: Graphes dirigés, diagrammes de réseau
-        
+
     Formats de sortie supportés:
         - png: Format d'image raster
         - svg: Graphiques vectoriels évolutifs
     """
 
     def __init__(
-        self, 
-        base_url: Optional[str] = None, 
-        timeout: Optional[int] = None, 
-        max_bytes: Optional[int] = None
+        self,
+        base_url: Optional[str] = None,
+        timeout: Optional[int] = None,
+        max_bytes: Optional[int] = None,
     ) -> None:
         """Initialise le client Kroki.
-        
+
         Args:
             base_url: URL du service Kroki. Si None, utilise la configuration
                      ou par défaut http://localhost:8000
             timeout: Délai d'expiration des requêtes HTTP en secondes. Si None,
                     utilise la configuration ou par défaut 10 secondes
-            max_bytes: Taille maximum du source en octets avant utilisation 
+            max_bytes: Taille maximum du source en octets avant utilisation
                       de fichiers temporaires. Si None, utilise la configuration
                       ou par défaut 1MB
         """
@@ -74,7 +75,7 @@ class KrokiClient:
         self, diagram_type: str, output_format: str, diagram_source: str
     ) -> Tuple[bytes, str]:
         """Génère un diagramme en utilisant le service Kroki.
-        
+
         Valide les paramètres d'entrée, préprocesse le code source du diagramme
         pour appliquer les thèmes, puis envoie une requête HTTP au service Kroki
         pour générer l'image du diagramme.
@@ -86,11 +87,11 @@ class KrokiClient:
 
         Returns:
             Tuple[bytes, str]: Tuple contenant (données_image_binaires, content_type)
-            
+
         Raises:
             KrokiError: Si la génération échoue (syntaxe invalide, service indisponible,
                        timeout, etc.)
-            
+
         Example:
             >>> client = KrokiClient()
             >>> image_data, content_type = client.generate_diagram(
@@ -141,11 +142,11 @@ class KrokiClient:
 
     def _preprocess_diagram_source(self, diagram_type: str, diagram_source: str) -> str:
         """Prétraite le code source du diagramme pour appliquer les thèmes et le styling.
-        
+
         Args:
             diagram_type: Type de diagramme (mermaid, plantuml, graphviz)
             diagram_source: Code source original du diagramme
-            
+
         Returns:
             str: Code source modifié avec les configurations de thème appliquées
         """
@@ -157,78 +158,80 @@ class KrokiClient:
 
     def _preprocess_mermaid(self, source: str) -> str:
         """Ajoute la configuration de thème aux diagrammes Mermaid.
-        
+
         Injecte la configuration de thème Mermaid au début du code source
         si aucune configuration n'est déjà présente.
-        
+
         Args:
             source: Code source Mermaid original
-            
+
         Returns:
             str: Code source avec configuration de thème ajoutée si nécessaire
         """
         # Get theme from config or default to base (light theme)
-        theme = current_app.config.get("DIAGRAM_THEME", "base") if current_app else "base"
-        
+        theme = (
+            current_app.config.get("DIAGRAM_THEME", "base") if current_app else "base"
+        )
+
         # Map our theme names to Mermaid theme names
         mermaid_themes = {
             "default": "base",
-            "light": "base", 
+            "light": "base",
             "dark": "dark",
             "neutral": "neutral",
-            "forest": "forest"
+            "forest": "forest",
         }
-        
+
         mermaid_theme = mermaid_themes.get(theme, "base")
-        
+
         # Check if the source already contains theme configuration
         if "%%{init:" in source or "theme:" in source:
             return source
-            
+
         # Add theme configuration at the beginning
         theme_config = f"%%{{init: {{'theme': '{mermaid_theme}'}}}}%%\n"
         return theme_config + source
 
     def _preprocess_plantuml(self, source: str) -> str:
         """Ajoute le styling aux diagrammes PlantUML.
-        
+
         Injecte des paramètres de thème PlantUML pour un fond clair
         après la directive @startuml si elle est présente.
-        
+
         Args:
             source: Code source PlantUML original
-            
+
         Returns:
             str: Code source avec paramètres de style ajoutés si nécessaire
         """
         # For PlantUML, we can add skinparams for light background
         if not source.strip().startswith("@startuml"):
             return source
-            
+
         # Insert skinparam after @startuml
-        lines = source.split('\n')
+        lines = source.split("\n")
         if len(lines) > 0 and lines[0].strip().startswith("@startuml"):
             # Add light theme skinparams
             skinparams = [
                 "!theme plain",
                 "skinparam backgroundColor white",
-                "skinparam defaultFontColor black"
+                "skinparam defaultFontColor black",
             ]
             # Insert after @startuml line
             lines = lines[:1] + skinparams + lines[1:]
-            return '\n'.join(lines)
+            return "\n".join(lines)
         return source
 
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
     ) -> None:
         """Valide les paramètres d'entrée.
-        
+
         Args:
             diagram_type: Type de diagramme à valider
             output_format: Format de sortie à valider
             diagram_source: Code source du diagramme à valider
-            
+
         Raises:
             KrokiError: Si l'un des paramètres est invalide
         """
@@ -252,19 +255,19 @@ class KrokiClient:
         self, url: str, headers: dict, diagram_source: str, output_format: str
     ) -> Tuple[bytes, str]:
         """Génère un diagramme avec une requête HTTP directe.
-        
+
         Méthode optimisée pour les petits diagrammes qui peuvent être
         envoyés directement dans le corps de la requête HTTP.
-        
+
         Args:
             url: URL complète de l'endpoint Kroki
             headers: Headers HTTP pour la requête
             diagram_source: Code source du diagramme
             output_format: Format de sortie (png, svg)
-            
+
         Returns:
             Tuple[bytes, str]: Données binaires de l'image et content-type
-            
+
         Raises:
             requests.exceptions.HTTPError: En cas d'erreur HTTP
         """
@@ -285,20 +288,20 @@ class KrokiClient:
         self, url: str, headers: dict, diagram_source: str, output_format: str
     ) -> Tuple[bytes, str]:
         """Génère un diagramme en utilisant un fichier temporaire pour les gros payloads.
-        
+
         Méthode optimisée pour les diagrammes volumineux qui dépassent la limite
         max_bytes. Écrit le code source dans un fichier temporaire et l'envoie
         via une requête HTTP multipart.
-        
+
         Args:
             url: URL complète de l'endpoint Kroki
             headers: Headers HTTP pour la requête
             diagram_source: Code source du diagramme
             output_format: Format de sortie (png, svg)
-            
+
         Returns:
             Tuple[bytes, str]: Données binaires de l'image et content-type
-            
+
         Raises:
             requests.exceptions.HTTPError: En cas d'erreur HTTP
             OSError: En cas d'erreur lors de la gestion du fichier temporaire

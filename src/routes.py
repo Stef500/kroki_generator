@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @main_bp.route("/")
 def index() -> str:
     """Render main page with diagram generation form.
-    
+
     Returns:
         str: Rendered HTML template for the main UI page
     """
@@ -26,21 +26,21 @@ def index() -> str:
 @main_bp.route("/health")
 def health() -> Tuple[Dict[str, Any], int]:
     """Advanced health check endpoint with Kroki connectivity.
-    
+
     Performs comprehensive health checks including:
     - Service availability
     - Kroki service connectivity and response time
     - System status assessment
-    
+
     Returns:
         Tuple[Dict[str, Any], int]: Health status JSON and HTTP status code
         - 200: All systems healthy
         - 503: Degraded service or unhealthy dependencies
-        
+
     Response Format:
         {
             "service": "kroki-flask-generator",
-            "version": "0.1.0", 
+            "version": "0.1.0",
             "timestamp": "2024-01-15T10:30:00Z",
             "status": "healthy|degraded|unhealthy",
             "checks": {
@@ -117,39 +117,39 @@ def health() -> Tuple[Dict[str, Any], int]:
 @main_bp.route("/api/generate", methods=["POST"])
 def generate_diagram() -> Union[Response, Tuple[Dict[str, str], int]]:
     """Generate diagram via Kroki API.
-    
+
     Supports both JSON and text/plain request formats for flexible usage.
     Validates input parameters, generates diagrams through Kroki service,
     and returns binary image data with appropriate content type.
-    
+
     Request Formats:
         JSON (application/json):
             {
                 "diagram_type": "mermaid|plantuml|graphviz",
-                "output_format": "png|svg", 
+                "output_format": "png|svg",
                 "diagram_source": "diagram source code",
                 "diagram_theme": "default|light|dark|neutral|forest" (optional)
             }
-            
+
         Text (text/plain + query params):
             POST /api/generate?diagram_type=mermaid&output_format=png
             Body: raw diagram source code
-    
+
     Returns:
-        Union[Response, Tuple[Dict[str, str], int]]: 
+        Union[Response, Tuple[Dict[str, str], int]]:
             - Success: Binary image data with appropriate MIME type
             - Error: JSON error response with HTTP status code
-            
+
     Response Headers:
         Content-Type: image/png, image/svg+xml
         Content-Disposition: inline; filename=diagram.{format}
         Cache-Control: no-cache, no-store, must-revalidate
-        
+
     Status Codes:
         200: Diagram generated successfully
         400: Invalid request data or diagram syntax error
         500: Internal server error
-        
+
     Raises:
         KrokiError: Diagram generation failures from Kroki service
     """
@@ -180,7 +180,7 @@ def generate_diagram() -> Union[Response, Tuple[Dict[str, str], int]]:
 
         # Log received data
         logger.info(f"Parsed data keys: {list(data.keys()) if data else 'None'}")
-        
+
         # Validate required fields
         required_fields = ["diagram_type", "output_format", "diagram_source"]
         missing_fields = [field for field in required_fields if not data.get(field)]
@@ -194,14 +194,15 @@ def generate_diagram() -> Union[Response, Tuple[Dict[str, str], int]]:
 
         # Generate diagram
         kroki_client = KrokiClient()
-        
+
         # Set theme if provided
         if "diagram_theme" in data:
             # Temporarily set theme in current_app config for this request
             from flask import current_app
+
             original_theme = current_app.config.get("DIAGRAM_THEME")
             current_app.config["DIAGRAM_THEME"] = data["diagram_theme"]
-        
+
         try:
             image_data, content_type = kroki_client.generate_diagram(
                 diagram_type=data["diagram_type"],
@@ -236,5 +237,6 @@ def generate_diagram() -> Union[Response, Tuple[Dict[str, str], int]]:
         logger.error(f"Unexpected error in generate_diagram: {str(e)}")
         logger.error(f"Error type: {type(e)}")
         import traceback
+
         logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({"error": f"Internal server error: {str(e)}"}), 500

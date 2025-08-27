@@ -14,11 +14,11 @@ load_dotenv()
 
 class Config:
     """Base configuration class.
-    
+
     Contains default configuration values that can be overridden by
     environment variables. Serves as the parent class for environment-specific
     configurations.
-    
+
     Environment Variables:
         KROKI_URL: Kroki service endpoint URL (default: http://localhost:8000)
         REQUEST_TIMEOUT: HTTP request timeout in seconds (default: 10)
@@ -51,7 +51,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development environment configuration.
-    
+
     Enables debug mode and provides development-friendly settings.
     Used for local development and testing.
     """
@@ -61,7 +61,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     """Production environment configuration.
-    
+
     Disables debug mode and provides production-ready settings
     with enhanced security and performance optimizations.
     """
@@ -71,7 +71,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     """Testing environment configuration.
-    
+
     Enables testing mode and debug mode for comprehensive
     test suite execution with detailed error reporting.
     """

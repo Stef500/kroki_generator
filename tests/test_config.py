@@ -1,9 +1,14 @@
 """Tests for configuration module."""
 
-import pytest
 import os
 from unittest.mock import patch
-from src.config import Config, DevelopmentConfig, ProductionConfig, TestingConfig, config
+from src.config import (
+    Config,
+    DevelopmentConfig,
+    ProductionConfig,
+    TestingConfig,
+    config,
+)
 
 
 class TestConfig:
@@ -12,14 +17,16 @@ class TestConfig:
     def test_base_config_defaults(self):
         """Test base Config class default values."""
         cfg = Config()
-        
+
         # Test default values
         assert cfg.KROKI_URL == os.getenv("KROKI_URL", "http://localhost:8000")
         assert cfg.REQUEST_TIMEOUT == int(os.getenv("REQUEST_TIMEOUT", "10"))
         assert cfg.MAX_BYTES == int(os.getenv("MAX_BYTES", "1000000"))
         assert cfg.FLASK_ENV == os.getenv("FLASK_ENV", "development")
         assert cfg.SECRET_KEY == os.getenv("SECRET_KEY", "dev-key-change-in-production")
-        assert cfg.DIAGRAM_BACKGROUND_COLOR == os.getenv("DIAGRAM_BACKGROUND_COLOR", "white")
+        assert cfg.DIAGRAM_BACKGROUND_COLOR == os.getenv(
+            "DIAGRAM_BACKGROUND_COLOR", "white"
+        )
         assert cfg.DIAGRAM_THEME == os.getenv("DIAGRAM_THEME", "default")
 
     def test_config_uses_environment_variables(self):
@@ -27,15 +34,15 @@ class TestConfig:
         # Just test that the Config class can access environment variables
         # The actual values depend on current environment
         cfg = Config()
-        assert hasattr(cfg, 'KROKI_URL')
-        assert hasattr(cfg, 'REQUEST_TIMEOUT')
-        assert hasattr(cfg, 'MAX_BYTES')
+        assert hasattr(cfg, "KROKI_URL")
+        assert hasattr(cfg, "REQUEST_TIMEOUT")
+        assert hasattr(cfg, "MAX_BYTES")
 
     def test_config_environment_variable_pattern(self):
         """Test that Config follows environment variable pattern."""
         # Test that os.getenv is called with proper defaults
         cfg = Config()
-        
+
         # These should be strings/ints, not None
         assert isinstance(cfg.KROKI_URL, str)
         assert isinstance(cfg.REQUEST_TIMEOUT, int)
@@ -75,7 +82,7 @@ class TestConfig:
         assert "production" in config
         assert "testing" in config
         assert "default" in config
-        
+
         assert config["development"] == DevelopmentConfig
         assert config["production"] == ProductionConfig
         assert config["testing"] == TestingConfig

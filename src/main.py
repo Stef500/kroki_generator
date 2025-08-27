@@ -12,18 +12,18 @@ from src.config import config
 
 def create_app(config_name: Optional[str] = None) -> Flask:
     """Create and configure Flask application.
-    
+
     Factory function to create a Flask application instance with proper
     configuration and blueprint registration.
-    
+
     Args:
         config_name: Configuration name to use. If None, uses FLASK_CONFIG
                     environment variable or defaults to 'default'.
                     Valid values: 'development', 'production', 'testing', 'default'
-    
+
     Returns:
         Flask: Configured Flask application instance
-        
+
     Example:
         >>> app = create_app('development')
         >>> app.run(debug=True)
