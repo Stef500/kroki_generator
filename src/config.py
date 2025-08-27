@@ -23,6 +23,10 @@ class Config:
     # Security
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-key-change-in-production")
 
+    # Diagram styling
+    DIAGRAM_BACKGROUND_COLOR = os.getenv("DIAGRAM_BACKGROUND_COLOR", "white")
+    DIAGRAM_THEME = os.getenv("DIAGRAM_THEME", "default")
+
 
 class DevelopmentConfig(Config):
     """Development configuration."""

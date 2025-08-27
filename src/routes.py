@@ -85,6 +85,7 @@ def health():
 @main_bp.route("/api/generate", methods=["POST"])
 def generate_diagram():
     """Generate diagram via Kroki API."""
+    logger.info(f"Received request: Content-Type={request.content_type}")
     try:
         # Parse request data
         if request.content_type == "application/json":
@@ -109,6 +110,9 @@ def generate_diagram():
                 400,
             )
 
+        # Log received data
+        logger.info(f"Parsed data keys: {list(data.keys()) if data else 'None'}")
+        
         # Validate required fields
         required_fields = ["diagram_type", "output_format", "diagram_source"]
         missing_fields = [field for field in required_fields if not data.get(field)]
@@ -122,11 +126,24 @@ def generate_diagram():
 
         # Generate diagram
         kroki_client = KrokiClient()
-        image_data, content_type = kroki_client.generate_diagram(
-            diagram_type=data["diagram_type"],
-            output_format=data["output_format"],
-            diagram_source=data["diagram_source"],
-        )
+        
+        # Set theme if provided
+        if "diagram_theme" in data:
+            # Temporarily set theme in current_app config for this request
+            from flask import current_app
+            original_theme = current_app.config.get("DIAGRAM_THEME")
+            current_app.config["DIAGRAM_THEME"] = data["diagram_theme"]
+        
+        try:
+            image_data, content_type = kroki_client.generate_diagram(
+                diagram_type=data["diagram_type"],
+                output_format=data["output_format"],
+                diagram_source=data["diagram_source"],
+            )
+        finally:
+            # Restore original theme
+            if "diagram_theme" in data and original_theme is not None:
+                current_app.config["DIAGRAM_THEME"] = original_theme
 
         # Return binary response
         filename = f"diagram.{data['output_format']}"
@@ -149,4 +166,7 @@ def generate_diagram():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         logger.error(f"Unexpected error in generate_diagram: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
+        logger.error(f"Error type: {type(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500

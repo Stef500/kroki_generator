@@ -29,6 +29,26 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label for="diagram_theme" class="form-label">Diagram Theme</label>
+                        <select class="form-select" id="diagram_theme" name="diagram_theme">
+                            <option value="light" selected>Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="forest">Forest</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="background_color" class="form-label">Background Color</label>
+                        <select class="form-select" id="background_color" name="background_color">
+                            <option value="white" selected>White</option>
+                            <option value="transparent">Transparent</option>
+                            <option value="#f8f9fa">Light Gray</option>
+                            <option value="black">Black</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="diagram_source" class="form-label">Diagram Source</label>
                         <textarea class="form-control" id="diagram_source" name="diagram_source" 
                                   rows="10" placeholder="Enter your diagram source code here..." required></textarea>
@@ -136,19 +156,20 @@ document.getElementById('diagramForm').addEventListener('submit', async function
         const url = URL.createObjectURL(blob);
         
         // Display result
-        if (data.output_format === 'svg') {
-            const img = document.createElement('img');
-            img.src = url;
-            img.style.maxWidth = '100%';
-            result.innerHTML = '';
-            result.appendChild(img);
-        } else {
-            const img = document.createElement('img');
-            img.src = url;
-            img.style.maxWidth = '100%';
-            result.innerHTML = '';
-            result.appendChild(img);
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.maxWidth = '100%';
+        
+        // Apply background color
+        const bgColor = data.background_color || 'white';
+        if (bgColor !== 'transparent') {
+            img.style.backgroundColor = bgColor;
+            img.style.borderRadius = '0.25rem';
+            img.style.padding = '0.5rem';
         }
+        
+        result.innerHTML = '';
+        result.appendChild(img);
         
         // Setup download
         downloadBtn.style.display = 'inline-block';

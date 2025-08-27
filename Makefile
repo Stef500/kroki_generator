@@ -1,4 +1,4 @@
-.PHONY: help install run test lint clean dev-install
+.PHONY: help install run test lint clean dev-install kroki-start kroki-stop dev dev-stop
 
 help: ## Show this help message
 	@echo 'Usage: make <target>'
@@ -13,7 +13,7 @@ dev-install: ## Install development dependencies
 	uv pip install -e .[test,dev]
 
 run: ## Run the Flask development server
-	python src/main.py
+	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
 
 test: ## Run tests with coverage
 	pytest tests/ -v --cov=src --cov-report=term-missing
@@ -43,8 +43,26 @@ docker-run: ## Run with Docker Compose
 docker-down: ## Stop Docker Compose
 	docker compose down
 
+kroki-start: ## Start only Kroki services in background
+	docker compose up -d kroki mermaid
+
+kroki-stop: ## Stop Kroki services
+	docker compose stop kroki mermaid
+
+dev: ## Start Kroki and run Flask app for development
+	@echo "Starting Kroki services..."
+	docker compose up -d kroki mermaid
+	@echo "Waiting for Kroki to be ready..."
+	@sleep 3
+	@echo "Starting Flask application..."
+	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
+
+dev-stop: ## Stop all development services
+	docker compose stop kroki mermaid
+	@echo "Kroki services stopped. Press Ctrl+C to stop Flask if running."
+
 health: ## Check application health
-	curl -f http://localhost:5000/health || echo "Service not running"
+	curl -f http://localhost:5001/health || echo "Service not running"
 
 docker-test: ## Run Docker integration tests
 	./scripts/test-docker.sh

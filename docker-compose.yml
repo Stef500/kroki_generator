@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Main Flask application
   app:
@@ -31,7 +29,7 @@ services:
 
   # Kroki service for diagram generation  
   kroki:
-    image: yuzutech/kroki:0.24.0
+    image: yuzutech/kroki:latest
     ports:
       - "8000:8000"
     environment:
@@ -52,7 +50,7 @@ services:
 
   # Mermaid companion service
   mermaid:
-    image: yuzutech/kroki-mermaid:0.24.0
+    image: yuzutech/kroki-mermaid:latest
     expose:
       - "8002"
     networks:

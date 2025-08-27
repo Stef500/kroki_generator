@@ -6,6 +6,11 @@ from typing import Tuple
 from flask import current_app
 
 
+class KrokiError(Exception):
+    """Exception raised for Kroki-related errors."""
+    pass
+
+
 class KrokiClient:
     """HTTP client for Kroki service."""
 
@@ -43,6 +48,9 @@ class KrokiClient:
         # Validate inputs
         self._validate_inputs(diagram_type, output_format, diagram_source)
 
+        # Preprocess diagram source based on type and theme
+        diagram_source = self._preprocess_diagram_source(diagram_type, diagram_source)
+
         # Prepare request
         url = f"{self.base_url}/{diagram_type}/{output_format}"
         headers = {
@@ -76,6 +84,58 @@ class KrokiClient:
                 raise KrokiError(
                     f"HTTP error {e.response.status_code}: {e.response.text}"
                 )
+
+    def _preprocess_diagram_source(self, diagram_type: str, diagram_source: str) -> str:
+        """Preprocess diagram source to apply themes and styling."""
+        if diagram_type == "mermaid":
+            return self._preprocess_mermaid(diagram_source)
+        elif diagram_type == "plantuml":
+            return self._preprocess_plantuml(diagram_source)
+        return diagram_source
+
+    def _preprocess_mermaid(self, source: str) -> str:
+        """Add theme configuration to Mermaid diagrams."""
+        # Get theme from config or default to base (light theme)
+        theme = current_app.config.get("DIAGRAM_THEME", "base") if current_app else "base"
+        
+        # Map our theme names to Mermaid theme names
+        mermaid_themes = {
+            "default": "base",
+            "light": "base", 
+            "dark": "dark",
+            "neutral": "neutral",
+            "forest": "forest"
+        }
+        
+        mermaid_theme = mermaid_themes.get(theme, "base")
+        
+        # Check if the source already contains theme configuration
+        if "%%{init:" in source or "theme:" in source:
+            return source
+            
+        # Add theme configuration at the beginning
+        theme_config = f"%%{{init: {{'theme': '{mermaid_theme}'}}}}%%\n"
+        return theme_config + source
+
+    def _preprocess_plantuml(self, source: str) -> str:
+        """Add styling to PlantUML diagrams."""
+        # For PlantUML, we can add skinparams for light background
+        if not source.strip().startswith("@startuml"):
+            return source
+            
+        # Insert skinparam after @startuml
+        lines = source.split('\n')
+        if len(lines) > 0 and lines[0].strip().startswith("@startuml"):
+            # Add light theme skinparams
+            skinparams = [
+                "!theme plain",
+                "skinparam backgroundColor white",
+                "skinparam defaultFontColor black"
+            ]
+            # Insert after @startuml line
+            lines = lines[:1] + skinparams + lines[1:]
+            return '\n'.join(lines)
+        return source
 
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
@@ -144,9 +204,3 @@ class KrokiClient:
                 os.unlink(tmp_file_path)
             except OSError:
                 pass
-
-
-class KrokiError(Exception):
-    """Exception raised for Kroki-related errors."""
-
-    pass
