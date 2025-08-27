@@ -60,10 +60,29 @@ jobs:
         uv run pytest -m integration tests/test_integration.py || true
         docker compose down
 
-  docker:
+  docker-debug:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Debug workflow conditions
+      run: |
+        echo "=== Workflow Debug Info ==="
+        echo "Branch: ${{ github.ref }}"
+        echo "Event: ${{ github.event_name }}"
+        echo "Repository: ${{ github.repository }}"
+        echo "Actor: ${{ github.actor }}"
+        echo "=== Checking Secrets ==="
+        echo "DOCKERHUB_USERNAME exists: ${{ secrets.DOCKERHUB_USERNAME != '' }}"
+        echo "DOCKERHUB_TOKEN exists: ${{ secrets.DOCKERHUB_TOKEN != '' }}"
+        echo "=== Test Job Status ==="
+        echo "Test job completed successfully"
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [test, docker-debug]
+    if: github.ref == 'refs/heads/main' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != ''
     
     steps:
     - uses: actions/checkout@v4
