@@ -72,6 +72,14 @@
 **DoD** ✅ : `docker compose up --build` → UI `:8080` + génération E2E + healthcheck OK.
 
 ## M3 — Qualité & Tests (4h détaillé)
+### Documentation (4h)
+- [ ] README complet (1h)
+  - Setup local + Docker
+  - Usage UI + API
+  - Config variables
+- [ ] Docstring + type hints (1h)
+- [ ] Exemples curl (0.5h)
+
 ### Tests automatisés (2.5h)
 - [ ] Tests unitaires complets ≥80% coverage (1.5h) [dépend: M1]
   - Routes + validation
@@ -81,14 +89,6 @@
   - E2E via docker-compose
   - Performance (payload large)
   - Robustesse (Kroki down)
-
-### Documentation (4h)
-- [ ] README complet (1h)
-  - Setup local + Docker
-  - Usage UI + API
-  - Config variables
-- [ ] Docstring + type hints (1h)
-- [ ] Exemples curl (0.5h)
 
 ### Qualité code (1.5h)
 - [ ] Pre-commit hooks (black, ruff, pytest) (0.5h)

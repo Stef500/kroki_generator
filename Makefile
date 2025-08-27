@@ -7,10 +7,10 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 install: ## Install production dependencies
-	pip install -e .
+	uv pip install -e .
 
 dev-install: ## Install development dependencies
-	pip install -e .[test,dev]
+	uv pip install -e .[test,dev]
 
 run: ## Run the Flask development server
 	python src/main.py
