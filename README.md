@@ -203,6 +203,22 @@ docker compose up app
 ```
 
 ### Production
+
+#### Using DockerHub Image (Recommended)
+```bash
+# Pull latest image from DockerHub
+docker pull YOUR-USERNAME/kroki-flask-generator:latest
+
+# Run with external Kroki
+docker run -d \
+  --name kroki-app \
+  -p 8080:8080 \
+  -e KROKI_URL=http://your-kroki-service:8000 \
+  -e FLASK_CONFIG=production \
+  YOUR-USERNAME/kroki-flask-generator:latest
+```
+
+#### Building Locally
 ```bash
 # Build production image
 docker build -t kroki-flask-generator:latest .
@@ -214,6 +230,15 @@ docker run -d \
   -e KROKI_URL=http://your-kroki-service:8000 \
   -e FLASK_CONFIG=production \
   kroki-flask-generator:latest
+```
+
+#### Multi-architecture Support
+The DockerHub images support both `linux/amd64` and `linux/arm64` architectures.
+
+#### Testing Docker Build
+```bash
+# Test build locally
+./scripts/test-docker-build.sh YOUR-USERNAME
 ```
 
 ## 🛠️ Development
@@ -253,6 +278,27 @@ pytest -m integration
 # With coverage
 pytest --cov=src --cov-report=html
 ```
+
+### CI/CD Pipeline
+
+The project includes a comprehensive GitHub Actions pipeline:
+
+- **Tests**: Unit tests with 85% coverage requirement
+- **Quality**: Linting (ruff) and formatting (black) checks
+- **Docker**: Multi-architecture builds (amd64/arm64) 
+- **DockerHub**: Automatic image publishing on main branch
+
+#### Pipeline Triggers
+- Push to `main` branch → Full pipeline + DockerHub push
+- Pull requests → Tests and quality checks only
+
+#### DockerHub Integration
+Images are automatically built and pushed to DockerHub with tags:
+- `latest` - Latest main branch
+- `main-SHA` - Specific commit version
+- `main` - Branch identifier
+
+See [`docs/DOCKERHUB_SETUP.md`](docs/DOCKERHUB_SETUP.md) for configuration details.
 
 ### Code Quality
 ```bash

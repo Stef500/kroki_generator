@@ -14,8 +14,10 @@ help: ## Show this help message
 	@echo '  format     Auto-format code'
 	@echo ''
 	@echo 'Production:'
-	@echo '  docker     Run production with Docker Compose'
-	@echo '  docker-stop Stop Docker services'
+	@echo '  docker       Run production with Docker Compose'
+	@echo '  docker-build Build Docker image locally'
+	@echo '  docker-test  Test Docker image locally'
+	@echo '  docker-stop  Stop Docker services'
 	@echo ''
 	@echo 'Utils:'
 	@echo '  clean      Clean temporary files'
@@ -54,6 +56,12 @@ format: ## Auto-format code
 
 docker: ## Run production with Docker Compose
 	docker compose up --build
+
+docker-build: ## Build Docker image locally
+	docker build -t kroki-flask-generator:latest .
+
+docker-test: ## Test Docker image locally  
+	./scripts/test-docker-build.sh
 
 docker-stop: ## Stop Docker services
 	docker compose down

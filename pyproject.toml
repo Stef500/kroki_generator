@@ -21,3 +21,12 @@ dev = [
     "ruff>=0.1.0",
     "pre-commit>=3.4.0"
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests requiring external services",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
