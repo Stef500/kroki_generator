@@ -260,7 +260,7 @@ docker compose up app
 #### Using DockerHub Image (Recommended)
 ```bash
 # Pull latest image from DockerHub
-docker pull YOUR-USERNAME/kroki-flask-generator:latest
+docker pull stef500/kroki-flask-generator:latest
 
 # Run with external Kroki
 docker run -d \
@@ -268,7 +268,7 @@ docker run -d \
   -p 8080:8080 \
   -e KROKI_URL=http://your-kroki-service:8000 \
   -e FLASK_CONFIG=production \
-  YOUR-USERNAME/kroki-flask-generator:latest
+  stef500/kroki-flask-generator:latest
 ```
 
 #### Building Locally
