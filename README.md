@@ -20,12 +20,12 @@ A Flask web application that provides a simple interface for generating diagrams
 
 **Installation en une seule ligne :**
 ```bash
-curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/install.sh | bash
 ```
 
 **Ou avec Docker Compose directement :**
 ```bash
-curl -L https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/docker-compose.yml | docker-compose -f - up -d
+curl -L https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/docker-compose.yml | docker-compose -f - up -d
 ```
 
 **Accès à l'application :**
@@ -264,10 +264,10 @@ docker compose up app
 
 ```bash
 # Installation complète en une ligne
-curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/install.sh | bash
 
 # Ou installation manuelle
-curl -L https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/docker-compose.yml -o docker-compose.yml
+curl -L https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/docker-compose.yml -o docker-compose.yml
 docker-compose up -d
 ```
 
@@ -280,7 +280,7 @@ docker run -d \
   -p 8080:8080 \
   -e KROKI_URL=http://your-kroki-service:8000 \
   -e FLASK_CONFIG=production \
-  stef500/kroki-flask-generator:latest
+  Stef500/kroki_generator:latest
 ```
 
 #### Multi-architecture Support

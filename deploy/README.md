@@ -7,7 +7,7 @@ Instructions pour déployer rapidement Kroki Flask Generator en production.
 ### Installation en une ligne
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/install.sh | bash
 ```
 
 Cette commande va :
@@ -20,7 +20,7 @@ Cette commande va :
 ### Avec port personnalisé
 
 ```bash
-APP_PORT=3000 curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/install.sh | bash
+APP_PORT=3000 curl -sSL https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/install.sh | bash
 ```
 
 ## Installation manuelle
@@ -28,7 +28,7 @@ APP_PORT=3000 curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-ge
 ### Étape 1 : Récupérer la configuration
 
 ```bash
-curl -L https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/docker-compose.yml -o docker-compose.yml
+curl -L https://raw.githubusercontent.com/Stef500/kroki_generator/main/deploy/docker-compose.yml -o docker-compose.yml
 ```
 
 ### Étape 2 : Démarrer les services
@@ -129,8 +129,8 @@ Une fois installé, accédez à l'application :
 ## Support
 
 - **Documentation** : [README principal](../README.md)
-- **Issues** : [GitHub Issues](https://github.com/stef500/kroki-flask-generator/issues)
-- **Docker Hub** : [stef500/kroki-flask-generator](https://hub.docker.com/r/stef500/kroki-flask-generator)
+- **Issues** : [GitHub Issues](https://github.com/Stef500/kroki_generator/issues)
+- **Docker Hub** : [Stef500/kroki_generator](https://hub.docker.com/r/Stef500/kroki_generator)
 
 ## Désinstallation
 
@@ -139,7 +139,7 @@ Une fois installé, accédez à l'application :
 docker-compose down
 
 # Supprimer les images (optionnel)
-docker rmi stef500/kroki-flask-generator:latest yuzutech/kroki:latest yuzutech/kroki-mermaid:latest
+docker rmi Stef500/kroki_generator:latest yuzutech/kroki:latest yuzutech/kroki-mermaid:latest
 
 # Supprimer le fichier de configuration
 rm docker-compose.yml

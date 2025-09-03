@@ -61,7 +61,7 @@
 - **Makefile**: Fixed to use `uv run` for all commands
 
 ## Production Readiness
-- **DockerHub**: Image available at `stef500/kroki-flask-generator:latest`
+- **DockerHub**: Image available at `stef500/kroki-flask-generator:latest` (note: GitHub repo is `Stef500/kroki_generator`)
 - **README**: Updated with correct DockerHub references
 - **CI/CD**: All workflows remain functional
 - **Deployment**: No changes required for production deployment

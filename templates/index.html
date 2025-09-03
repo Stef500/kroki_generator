@@ -8,7 +8,7 @@
                 <h5 class="card-title mb-0">Create Diagram</h5>
             </div>
             <div class="card-body">
-                <form id="diagramForm">
+                <form id="diagramForm" method="POST">
                     <div class="mb-3">
                         <label for="diagram_type" class="form-label">Diagram Type</label>
                         <select class="form-select" id="diagram_type" name="diagram_type" required>
@@ -72,10 +72,16 @@
                                   rows="10" placeholder="Enter your diagram source code here..." required></textarea>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">
-                        <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
-                        Generate Diagram
-                    </button>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                            Generate Diagram
+                        </button>
+                        <small class="text-muted text-center">
+                            If the diagram doesn't appear, try disabling JavaScript or 
+                            <button type="button" id="fallbackBtn" class="btn btn-link btn-sm p-0">use fallback mode</button>
+                        </small>
+                    </div>
                 </form>
             </div>
         </div>
@@ -92,6 +98,9 @@
             <div class="card-body">
                 <div id="result" class="diagram-output">
                     <p class="text-muted">Generated diagram will appear here</p>
+                </div>
+                <div id="debug" class="alert alert-info mt-2" style="display: none;">
+                    <small id="debugMessage">Debug info will appear here</small>
                 </div>
                 <div id="error" class="alert alert-danger mt-3" style="display: none;"></div>
             </div>
@@ -387,9 +396,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Debug function
+function showDebugMessage(message) {
+    const debug = document.getElementById('debug');
+    const debugMessage = document.getElementById('debugMessage');
+    debugMessage.textContent = message;
+    debug.style.display = 'block';
+    setTimeout(() => debug.style.display = 'none', 5000);
+}
+
 // Form submission with history
 document.getElementById('diagramForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    console.log('Form submitted - starting diagram generation');
+    showDebugMessage('Starting diagram generation...');
     
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -403,10 +423,13 @@ document.getElementById('diagramForm').addEventListener('submit', async function
     submitBtn.disabled = true;
     error.style.display = 'none';
     downloadBtn.style.display = 'none';
+    console.log('Loading state activated');
     
     try {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
+        console.log('Form data collected:', data);
+        showDebugMessage('Sending request to API...');
         
         const response = await fetch('/api/generate', {
             method: 'POST',
@@ -416,18 +439,34 @@ document.getElementById('diagramForm').addEventListener('submit', async function
             body: JSON.stringify(data)
         });
         
+        console.log('API response status:', response.status, response.statusText);
+        showDebugMessage(`API responded with status ${response.status}`);
+        
         if (!response.ok) {
             const errorData = await response.json();
+            console.error('API error response:', errorData);
             throw new Error(errorData.error || 'Failed to generate diagram');
         }
         
         const blob = await response.blob();
+        console.log('Blob received, size:', blob.size, 'type:', blob.type);
+        showDebugMessage(`Received ${blob.type} blob of ${blob.size} bytes`);
+        
         const url = URL.createObjectURL(blob);
+        console.log('Object URL created:', url);
         
         // Display result
         const img = document.createElement('img');
         img.src = url;
         img.style.maxWidth = '100%';
+        img.onload = function() {
+            console.log('Image loaded successfully');
+            showDebugMessage('Diagram generated successfully!');
+        };
+        img.onerror = function() {
+            console.error('Image failed to load');
+            showDebugMessage('Error: Image failed to load');
+        };
         
         // Apply background color
         const bgColor = data.background_color || 'white';
@@ -439,6 +478,7 @@ document.getElementById('diagramForm').addEventListener('submit', async function
         
         result.innerHTML = '';
         result.appendChild(img);
+        console.log('Image added to result container');
         
         // Setup download
         downloadBtn.style.display = 'inline-block';
@@ -448,6 +488,7 @@ document.getElementById('diagramForm').addEventListener('submit', async function
             a.download = `diagram.${data.output_format}`;
             a.click();
         };
+        console.log('Download button configured');
         
         // Add to history on success
         addToHistory({
@@ -456,15 +497,32 @@ document.getElementById('diagramForm').addEventListener('submit', async function
             source: data.diagram_source,
             timestamp: new Date().toISOString()
         });
+        console.log('Added to history successfully');
         
     } catch (err) {
+        console.error('Error during diagram generation:', err);
         error.textContent = err.message;
         error.style.display = 'block';
         result.innerHTML = '<p class="text-muted">Generated diagram will appear here</p>';
+        showDebugMessage(`Error: ${err.message}`);
     } finally {
         loading.style.display = 'none';
         submitBtn.disabled = false;
+        console.log('Form submission completed');
     }
+});
+
+// Fallback mode button
+document.getElementById('fallbackBtn').addEventListener('click', function() {
+    console.log('Activating fallback mode');
+    showDebugMessage('Switching to fallback mode...');
+    
+    // Remove JavaScript handler and let form submit normally
+    const form = document.getElementById('diagramForm');
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    showDebugMessage('Fallback mode activated - form will submit normally');
 });
 </script>
 {% endblock %}
