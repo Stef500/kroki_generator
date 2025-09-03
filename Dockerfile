@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Add uv to PATH
-ENV PATH="/root/.cargo/bin:$PATH"
+# Add uv to PATH (uv installs to ~/.local/bin by default)
+ENV PATH="/root/.local/bin:$PATH"
 
 # Set work directory
 WORKDIR /app
@@ -18,7 +18,8 @@ WORKDIR /app
 COPY pyproject.toml ./
 
 # Install dependencies with uv (much faster than pip)
-RUN uv sync --no-dev --frozen
+# Use --system to install directly into system Python, not venv
+RUN uv sync --no-dev --frozen --system
 
 # Production stage
 FROM python:3.12-slim AS production
