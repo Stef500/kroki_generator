@@ -16,21 +16,24 @@ A Flask web application that provides a simple interface for generating diagrams
 
 ## 🚀 Quick Start
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Production Deployment (Recommended)
 
-1. **Clone and start the stack:**
+**Installation en une seule ligne :**
 ```bash
-git clone <repository-url>
-cd create-graph
-docker compose up --build
+curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/install.sh | bash
 ```
 
-2. **Access the application:**
-   - Web UI: http://localhost:8080
-   - Health Check: http://localhost:8080/health
-   - API: http://localhost:8080/api/generate
+**Ou avec Docker Compose directement :**
+```bash
+curl -L https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/docker-compose.yml | docker-compose -f - up -d
+```
 
-### Option 2: Local Development
+**Accès à l'application :**
+- **Interface web** : http://localhost:8080
+- **Health check** : http://localhost:8080/health
+- **API** : http://localhost:8080/api/generate
+
+### Option 2: Développement Local
 
 1. **Prerequisites:**
    - Python 3.12+
@@ -255,14 +258,23 @@ docker compose up --build
 docker compose up app
 ```
 
-### Production
+### Production (Recommandé)
 
-#### Using DockerHub Image (Recommended)
+**Pour un déploiement simple, utilisez les scripts dans le dossier `deploy/` :**
+
 ```bash
-# Pull latest image from DockerHub
-docker pull stef500/kroki-flask-generator:latest
+# Installation complète en une ligne
+curl -sSL https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/install.sh | bash
 
-# Run with external Kroki
+# Ou installation manuelle
+curl -L https://raw.githubusercontent.com/stef500/kroki-flask-generator/main/deploy/docker-compose.yml -o docker-compose.yml
+docker-compose up -d
+```
+
+Consultez [`deploy/README.md`](deploy/README.md) pour les instructions complètes.
+
+#### Alternative: Conteneur unique avec Kroki externe
+```bash
 docker run -d \
   --name kroki-app \
   -p 8080:8080 \
@@ -271,26 +283,11 @@ docker run -d \
   stef500/kroki-flask-generator:latest
 ```
 
-#### Building Locally
-```bash
-# Build production image
-docker build -t kroki-flask-generator:latest .
-
-# Run with external Kroki
-docker run -d \
-  --name kroki-app \
-  -p 8080:8080 \
-  -e KROKI_URL=http://your-kroki-service:8000 \
-  -e FLASK_CONFIG=production \
-  kroki-flask-generator:latest
-```
-
 #### Multi-architecture Support
-The DockerHub images support both `linux/amd64` and `linux/arm64` architectures.
+Les images DockerHub supportent `linux/amd64` et `linux/arm64`.
 
-#### Testing Docker Build
+#### Test local du build Docker
 ```bash
-# Test build locally
 ./scripts/test-docker-build.sh YOUR-USERNAME
 ```
 
