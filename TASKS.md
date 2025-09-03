@@ -114,10 +114,10 @@
 **DoD** ✅ : Pipeline CI configuré + `pytest -m "integration"` fonctionnel + coverage 85% > 80%. : Pipeline CI vert + `pytest -m "integration"` passe + coverage ≥80%.
 
 ## M4 — Extras (optionnels, 3h)
-### Extensions diagrammes (1.5h)
-- [ ] Support types additionnels (0.5h par type)
+### Extensions diagrammes (1.5h) ✅ COMPLETED
+- [x] Support types additionnels (0.5h par type) ✅
   - BlockDiag, Ditaa, Excalidraw
-  - SeqDiag, ActDiag, BPMN
+  - SeqDiag, ActDiag, BPMN  
   - **Priorité**: BlockDiag, Excalidraw (plus demandés)
 
 ### UX améliorée (1.5h)  

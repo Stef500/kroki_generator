@@ -191,3 +191,35 @@ class TestRoutes:
         assert response.status_code == 500
         data = json.loads(response.data)
         assert data["error"] == "Internal server error: Unexpected error"
+
+    @patch("src.routes.KrokiClient")
+    def test_generate_diagram_new_types(self, mock_kroki_class, client):
+        """Test new diagram types (blockdiag, excalidraw, ditaa, etc.)."""
+        mock_client = MagicMock()
+        mock_kroki_class.return_value = mock_client
+        mock_client.generate_diagram.return_value = (b"fake-image-data", "image/png")
+
+        # Test priority new types: blockdiag and excalidraw
+        new_types = [
+            ("blockdiag", "blockdiag {\n  A -> B -> C;\n}"),
+            ("excalidraw", '{"type": "excalidraw", "elements": []}'),
+            ("ditaa", "+--------+\n|  Test  |\n+--------+"),
+            ("seqdiag", "seqdiag {\n  A -> B -> C;\n}"),
+            ("actdiag", "actdiag {\n  A -> B -> C;\n}"),
+            ("bpmn", '<?xml version="1.0" encoding="UTF-8"?><definitions></definitions>')
+        ]
+
+        for diagram_type, source in new_types:
+            response = client.post(
+                "/api/generate",
+                json={
+                    "diagram_type": diagram_type,
+                    "output_format": "png", 
+                    "diagram_source": source,
+                },
+                content_type="application/json",
+            )
+
+            assert response.status_code == 200, f"Failed for {diagram_type}"
+            assert response.data == b"fake-image-data"
+            assert response.content_type == "image/png"

@@ -1,11 +1,11 @@
 # Kroki Flask Generator
 
-A Flask web application that provides a simple interface for generating diagrams using the [Kroki](https://kroki.io/) service. Supports multiple diagram types including Mermaid, PlantUML, and Graphviz with PNG and SVG output formats.
+A Flask web application that provides a simple interface for generating diagrams using the [Kroki](https://kroki.io/) service. Supports multiple diagram types including Mermaid, PlantUML, Graphviz, BlockDiag, Excalidraw, Ditaa, SeqDiag, ActDiag, and BPMN with PNG and SVG output formats.
 
 ## ✨ Features
 
 - **Web Interface**: Clean, responsive UI for diagram generation
-- **Multiple Formats**: Support for Mermaid, PlantUML, and Graphviz diagrams
+- **Multiple Formats**: Support for Mermaid, PlantUML, Graphviz, BlockDiag, Excalidraw, Ditaa, SeqDiag, ActDiag, and BPMN diagrams
 - **Flexible Output**: Generate PNG or SVG images
 - **REST API**: HTTP API for programmatic diagram generation
 - **Theme Support**: Configurable themes for Mermaid diagrams
@@ -122,6 +122,21 @@ curl -X POST "http://localhost:8080/api/generate?diagram_type=plantuml&output_fo
   --output diagram.svg
 ```
 
+**BlockDiag Example:**
+```bash
+curl -X POST http://localhost:8080/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "diagram_type": "blockdiag",
+    "output_format": "png", 
+    "diagram_source": "blockdiag {
+  A -> B -> C;
+  B -> D;
+}"
+  }' \
+  --output blockdiag.png
+```
+
 **With Theme:**
 ```bash
 curl -X POST http://localhost:8080/api/generate \
@@ -188,6 +203,43 @@ digraph G {
     A -> B;
     B -> C;
     C -> A;
+}
+```
+
+### BlockDiag (New)
+```
+blockdiag {
+    A -> B -> C;
+    B -> D;
+    default_node_color = lightblue;
+}
+```
+
+### Excalidraw (New)
+```
+{
+  "type": "excalidraw",
+  "elements": [
+    {"type": "rectangle", "x": 100, "y": 100, "width": 100, "height": 60},
+    {"type": "text", "text": "Sample Box", "x": 120, "y": 120}
+  ]
+}
+```
+
+### Ditaa (New)
+```
++--------+   +-------+
+|  cRED  |   | cBLU  |
+| Client +---+ Server|
+|     {d}|   |    {s}|
++--------+   +-------+
+```
+
+### SeqDiag (New)
+```
+seqdiag {
+    A -> B -> C;
+    A <- B <- C;
 }
 ```
 

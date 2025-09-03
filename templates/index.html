@@ -16,6 +16,12 @@
                             <option value="mermaid">Mermaid</option>
                             <option value="plantuml">PlantUML</option>
                             <option value="graphviz">Graphviz</option>
+                            <option value="blockdiag">BlockDiag</option>
+                            <option value="excalidraw">Excalidraw</option>
+                            <option value="ditaa">Ditaa</option>
+                            <option value="seqdiag">SeqDiag</option>
+                            <option value="actdiag">ActDiag</option>
+                            <option value="bpmn">BPMN</option>
                         </select>
                     </div>
                     
@@ -109,6 +115,34 @@ Bob -> Alice: Hi there!
     A -> B -> C;
     B -> D;
 }</code></pre>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <h6>BlockDiag</h6>
+                        <pre class="bg-light p-2 small"><code>blockdiag {
+    A -> B -> C;
+    B -> D;
+}</code></pre>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Excalidraw</h6>
+                        <pre class="bg-light p-2 small"><code>{
+  "type": "excalidraw",
+  "elements": [
+    {"type": "rectangle", "x": 100, "y": 100},
+    {"type": "text", "text": "Sample"}
+  ]
+}</code></pre>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Ditaa</h6>
+                        <pre class="bg-light p-2 small"><code>+--------+   +-------+
+|  cRED  |   | cBLU  |
+| Client +---+ Server|
+|     {d}|   |    {s}|
++--------+   +-------+</code></pre>
                     </div>
                 </div>
             </div>

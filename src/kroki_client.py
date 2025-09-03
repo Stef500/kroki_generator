@@ -144,7 +144,8 @@ class KrokiClient:
         """Prétraite le code source du diagramme pour appliquer les thèmes et le styling.
 
         Args:
-            diagram_type: Type de diagramme (mermaid, plantuml, graphviz)
+            diagram_type: Type de diagramme (mermaid, plantuml, graphviz, blockdiag, 
+                         excalidraw, ditaa, seqdiag, actdiag, bpmn)
             diagram_source: Code source original du diagramme
 
         Returns:
@@ -154,6 +155,11 @@ class KrokiClient:
             return self._preprocess_mermaid(diagram_source)
         elif diagram_type == "plantuml":
             return self._preprocess_plantuml(diagram_source)
+        elif diagram_type in ["blockdiag", "seqdiag", "actdiag"]:
+            return self._preprocess_blockdiag_family(diagram_type, diagram_source)
+        elif diagram_type == "ditaa":
+            return self._preprocess_ditaa(diagram_source)
+        # excalidraw and bpmn don't need preprocessing
         return diagram_source
 
     def _preprocess_mermaid(self, source: str) -> str:
@@ -222,6 +228,52 @@ class KrokiClient:
             return "\n".join(lines)
         return source
 
+    def _preprocess_blockdiag_family(self, diagram_type: str, source: str) -> str:
+        """Ajoute le styling aux diagrammes BlockDiag family (blockdiag, seqdiag, actdiag).
+
+        Args:
+            diagram_type: Type de diagramme blockdiag specifique
+            source: Code source original du diagramme
+
+        Returns:
+            str: Code source avec paramètres de style ajoutés si nécessaire
+        """
+        # Add default styling if not present
+        lines = source.strip().split('\n')
+        if lines and not any('default_' in line for line in lines[:5]):
+            # Add styling options
+            style_lines = [
+                "    default_node_color = lightblue;",
+                "    default_linecolor = black;",
+                "    default_textcolor = black;",
+                "    node_width = 128;",
+                "    node_height = 40;",
+                "    default_shape = box;"
+            ]
+            
+            # Insert after opening brace if present
+            if lines and '{' in lines[0]:
+                lines = lines[:1] + style_lines + lines[1:]
+            else:
+                # Insert at beginning
+                lines = style_lines + lines
+                
+        return '\n'.join(lines)
+
+    def _preprocess_ditaa(self, source: str) -> str:
+        """Prétraite les diagrammes Ditaa pour un styling cohérent.
+
+        Ditaa est un outil de diagrammes ASCII art qui convertit les 
+        diagrammes texte en images. Pas de preprocessing spécifique nécessaire.
+
+        Args:
+            source: Code source Ditaa original
+
+        Returns:
+            str: Code source inchangé (Ditaa n'a pas besoin de preprocessing)
+        """
+        return source
+
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
     ) -> None:
@@ -235,7 +287,7 @@ class KrokiClient:
         Raises:
             KrokiError: Si l'un des paramètres est invalide
         """
-        valid_types = ["mermaid", "plantuml", "graphviz"]
+        valid_types = ["mermaid", "plantuml", "graphviz", "blockdiag", "excalidraw", "ditaa", "seqdiag", "actdiag", "bpmn"]
         valid_formats = ["png", "svg"]
 
         if diagram_type not in valid_types:
