@@ -15,7 +15,7 @@ ENV PATH="/root/.local/bin:$PATH"
 WORKDIR /app
 
 # Copy requirements
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 
 # Install dependencies with uv (much faster than pip)
 # Use --system to install directly into system Python, not venv
