@@ -226,3 +226,77 @@ class TestRoutes:
             assert response.status_code == 200, f"Failed for {diagram_type}"
             assert response.data == b"fake-image-data"
             assert response.content_type == "image/png"
+
+    @patch("src.routes.KrokiClient")
+    def test_index_post_fallback_success(self, mock_kroki_class, client):
+        """Test POST fallback form submission success."""
+        mock_client = MagicMock()
+        mock_kroki_class.return_value = mock_client
+        mock_client.generate_diagram.return_value = (b"fake-image-data", "image/png")
+
+        response = client.post(
+            "/",
+            data={
+                "diagram_type": "mermaid",
+                "output_format": "png",
+                "diagram_source": "graph TD\nA --> B",
+                "diagram_theme": "dark",
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.data == b"fake-image-data"
+        assert response.content_type == "image/png"
+        assert "filename=diagram.png" in response.headers.get("Content-Disposition", "")
+
+    def test_index_post_missing_fields(self, client):
+        """Test POST fallback with missing required fields."""
+        response = client.post(
+            "/",
+            data={
+                "diagram_type": "mermaid",
+                # Missing output_format and diagram_source
+            },
+        )
+
+        assert response.status_code == 200
+        assert b"Please fill in all required fields" in response.data
+        assert b"Kroki Generator" in response.data
+
+    @patch("src.routes.KrokiClient")
+    def test_index_post_kroki_error(self, mock_kroki_class, client):
+        """Test POST fallback with Kroki error."""
+        mock_client = MagicMock()
+        mock_kroki_class.return_value = mock_client
+        mock_client.generate_diagram.side_effect = KrokiError("Invalid syntax")
+
+        response = client.post(
+            "/",
+            data={
+                "diagram_type": "mermaid",
+                "output_format": "png",
+                "diagram_source": "invalid",
+            },
+        )
+
+        assert response.status_code == 200
+        assert b"Diagram generation failed: Invalid syntax" in response.data
+
+    @patch("src.routes.KrokiClient")
+    def test_index_post_unexpected_error(self, mock_kroki_class, client):
+        """Test POST fallback with unexpected error."""
+        mock_client = MagicMock()
+        mock_kroki_class.return_value = mock_client
+        mock_client.generate_diagram.side_effect = ValueError("Unexpected")
+
+        response = client.post(
+            "/",
+            data={
+                "diagram_type": "mermaid",
+                "output_format": "png",
+                "diagram_source": "graph TD\nA --> B",
+            },
+        )
+
+        assert response.status_code == 200
+        assert b"Internal error: Unexpected" in response.data

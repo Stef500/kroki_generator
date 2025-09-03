@@ -8,12 +8,15 @@
                 <h5 class="card-title mb-0">Create Diagram</h5>
             </div>
             <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
                 <form id="diagramForm" method="POST">
                     <div class="mb-3">
                         <label for="diagram_type" class="form-label">Diagram Type</label>
                         <select class="form-select" id="diagram_type" name="diagram_type" required>
                             <option value="">Select diagram type...</option>
-                            <option value="mermaid">Mermaid</option>
+                            <option value="mermaid" {% if form_data and form_data.get('diagram_type') == 'mermaid' %}selected{% endif %}>Mermaid</option>
                             <option value="plantuml">PlantUML</option>
                             <option value="graphviz">Graphviz</option>
                             <option value="blockdiag">BlockDiag</option>
@@ -69,7 +72,7 @@
                         </div>
                         
                         <textarea class="form-control" id="diagram_source" name="diagram_source" 
-                                  rows="10" placeholder="Enter your diagram source code here..." required></textarea>
+                                  rows="10" placeholder="Enter your diagram source code here..." required>{% if form_data %}{{ form_data.get('diagram_source', '') }}{% endif %}</textarea>
                     </div>
                     
                     <div class="d-grid gap-2">
