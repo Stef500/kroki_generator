@@ -72,57 +72,7 @@ class TestKrokiClient:
         # Ditaa doesn't need preprocessing, should return unchanged
         assert result == source
 
-    def test_preprocess_excalidraw_valid_json(self):
-        """Test preprocessing for valid Excalidraw JSON."""
-        valid_json = '{"type": "excalidraw", "elements": [{"type": "rectangle", "x": 100, "y": 100}]}'
-        result = self.client._preprocess_excalidraw(valid_json)
 
-        # Should return valid JSON
-        import json
-
-        parsed = json.loads(result)
-        assert parsed["type"] == "excalidraw"
-        assert "elements" in parsed
-
-    def test_preprocess_excalidraw_missing_type(self):
-        """Test preprocessing for Excalidraw JSON missing type field."""
-        json_without_type = '{"elements": [{"type": "rectangle", "x": 100, "y": 100}]}'
-        result = self.client._preprocess_excalidraw(json_without_type)
-
-        import json
-
-        parsed = json.loads(result)
-        # Should add type field
-        assert parsed["type"] == "excalidraw"
-
-    def test_preprocess_excalidraw_missing_elements(self):
-        """Test preprocessing for Excalidraw JSON missing elements field."""
-        json_without_elements = '{"type": "excalidraw"}'
-        result = self.client._preprocess_excalidraw(json_without_elements)
-
-        import json
-
-        parsed = json.loads(result)
-        # Should add empty elements array
-        assert parsed["elements"] == []
-
-    def test_preprocess_excalidraw_invalid_json(self):
-        """Test preprocessing for invalid Excalidraw JSON."""
-        with pytest.raises(KrokiError, match="Invalid Excalidraw JSON format"):
-            self.client._preprocess_excalidraw("invalid json")
-
-    def test_preprocess_excalidraw_wrong_type(self):
-        """Test preprocessing for Excalidraw JSON with wrong type."""
-        wrong_type_json = '{"type": "wrong", "elements": []}'
-        with pytest.raises(
-            KrokiError, match="Excalidraw data must have type 'excalidraw'"
-        ):
-            self.client._preprocess_excalidraw(wrong_type_json)
-
-    def test_preprocess_excalidraw_non_object(self):
-        """Test preprocessing for non-object Excalidraw data."""
-        with pytest.raises(KrokiError, match="Excalidraw data must be a JSON object"):
-            self.client._preprocess_excalidraw('["not", "an", "object"]')
 
     def test_generate_diagram_success_png(self, requests_mock):
         """Test successful PNG diagram generation."""

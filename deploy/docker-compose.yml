@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: stef500/kroki-flask-generator:latest
@@ -30,8 +28,12 @@ services:
     environment:
       - KROKI_MERMAID_HOST=mermaid
       - KROKI_MERMAID_PORT=8002
+      - KROKI_EXCALIDRAW_HOST=excalidraw
+      - KROKI_EXCALIDRAW_PORT=8004
     depends_on:
       mermaid:
+        condition: service_started
+      excalidraw:
         condition: service_started
     networks:
       - kroki-network
@@ -52,6 +54,14 @@ services:
     restart: unless-stopped
     environment:
       - PUPPETEER_ARGS=--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage
+
+  excalidraw:
+    image: yuzutech/kroki-excalidraw:latest
+    expose:
+      - "8004"
+    networks:
+      - kroki-network
+    restart: unless-stopped
 
 networks:
   kroki-network:

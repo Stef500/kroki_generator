@@ -159,9 +159,7 @@ class KrokiClient:
             return self._preprocess_blockdiag_family(diagram_type, diagram_source)
         elif diagram_type == "ditaa":
             return self._preprocess_ditaa(diagram_source)
-        elif diagram_type == "excalidraw":
-            return self._preprocess_excalidraw(diagram_source)
-        # bpmn doesn't need preprocessing
+        # excalidraw and bpmn don't need preprocessing
         return diagram_source
 
     def _preprocess_mermaid(self, source: str) -> str:
@@ -276,45 +274,7 @@ class KrokiClient:
         """
         return source
 
-    def _preprocess_excalidraw(self, source: str) -> str:
-        """Prétraite les diagrammes Excalidraw pour valider le format JSON.
 
-        Excalidraw utilise un format JSON spécifique. Cette méthode valide
-        que le JSON est bien formé et contient les champs requis.
-
-        Args:
-            source: Code source Excalidraw au format JSON
-
-        Returns:
-            str: JSON validé et formaté
-
-        Raises:
-            KrokiError: Si le JSON n'est pas valide ou manque des champs requis
-        """
-        import json
-
-        try:
-            # Parse JSON to validate structure
-            data = json.loads(source)
-
-            # Validate required Excalidraw structure
-            if not isinstance(data, dict):
-                raise KrokiError("Excalidraw data must be a JSON object")
-
-            # Ensure we have the required fields for Excalidraw
-            if "type" not in data:
-                data["type"] = "excalidraw"
-            elif data["type"] != "excalidraw":
-                raise KrokiError("Excalidraw data must have type 'excalidraw'")
-
-            if "elements" not in data:
-                data["elements"] = []
-
-            # Return properly formatted JSON
-            return json.dumps(data, separators=(",", ":"))
-
-        except json.JSONDecodeError as e:
-            raise KrokiError(f"Invalid Excalidraw JSON format: {str(e)}")
 
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
