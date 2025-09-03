@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://raw.githubusercontent.com/stef500/kroki-flask-generator/main"
+REPO_URL="https://raw.githubusercontent.com/Stef500/kroki_generator/main"
 COMPOSE_FILE="deploy/docker-compose.yml"
 DEFAULT_PORT=8080
 APP_PORT=${APP_PORT:-$DEFAULT_PORT}
