@@ -159,7 +159,9 @@ class KrokiClient:
             return self._preprocess_blockdiag_family(diagram_type, diagram_source)
         elif diagram_type == "ditaa":
             return self._preprocess_ditaa(diagram_source)
-        # excalidraw and bpmn don't need preprocessing
+        elif diagram_type == "excalidraw":
+            return self._preprocess_excalidraw(diagram_source)
+        # bpmn doesn't need preprocessing
         return diagram_source
 
     def _preprocess_mermaid(self, source: str) -> str:
@@ -274,6 +276,46 @@ class KrokiClient:
         """
         return source
 
+    def _preprocess_excalidraw(self, source: str) -> str:
+        """Prétraite les diagrammes Excalidraw pour valider le format JSON.
+
+        Excalidraw utilise un format JSON spécifique. Cette méthode valide
+        que le JSON est bien formé et contient les champs requis.
+
+        Args:
+            source: Code source Excalidraw au format JSON
+
+        Returns:
+            str: JSON validé et formaté
+
+        Raises:
+            KrokiError: Si le JSON n'est pas valide ou manque des champs requis
+        """
+        import json
+
+        try:
+            # Parse JSON to validate structure
+            data = json.loads(source)
+
+            # Validate required Excalidraw structure
+            if not isinstance(data, dict):
+                raise KrokiError("Excalidraw data must be a JSON object")
+
+            # Ensure we have the required fields for Excalidraw
+            if "type" not in data:
+                data["type"] = "excalidraw"
+            elif data["type"] != "excalidraw":
+                raise KrokiError("Excalidraw data must have type 'excalidraw'")
+
+            if "elements" not in data:
+                data["elements"] = []
+
+            # Return properly formatted JSON
+            return json.dumps(data, separators=(",", ":"))
+
+        except json.JSONDecodeError as e:
+            raise KrokiError(f"Invalid Excalidraw JSON format: {str(e)}")
+
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
     ) -> None:
@@ -332,6 +374,7 @@ class KrokiClient:
 
         Raises:
             requests.exceptions.HTTPError: En cas d'erreur HTTP
+            KrokiError: Si Kroki retourne une image d'erreur
         """
         response = requests.post(
             url,
@@ -340,6 +383,29 @@ class KrokiClient:
             timeout=self.timeout,
         )
         response.raise_for_status()
+
+        # Check if Kroki returned an error image (PNG with error text)
+        if output_format == "png" and response.content.startswith(b"\x89PNG"):
+            # Try to extract error message from PNG content
+            content_str = response.content.decode("utf-8", errors="ignore")
+            if any(
+                error_word in content_str
+                for error_word in ["error", "invalid", "syntax", "failed"]
+            ):
+                # Extract readable error message
+                lines = content_str.split("\n")
+                error_lines = [
+                    line.strip()
+                    for line in lines
+                    if line.strip() and len(line.strip()) > 3
+                ]
+                if error_lines:
+                    error_msg = error_lines[0][:100]  # First meaningful line, truncated
+                    raise KrokiError(f"Diagram generation failed: {error_msg}")
+                else:
+                    raise KrokiError(
+                        "Diagram generation failed - invalid diagram syntax"
+                    )
 
         content_type = (
             f"image/{output_format}" if output_format != "svg" else "image/svg+xml"
@@ -367,6 +433,7 @@ class KrokiClient:
         Raises:
             requests.exceptions.HTTPError: En cas d'erreur HTTP
             OSError: En cas d'erreur lors de la gestion du fichier temporaire
+            KrokiError: Si Kroki retourne une image d'erreur
         """
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".txt", delete=False
@@ -380,6 +447,31 @@ class KrokiClient:
                     url, data=f, headers=headers, timeout=self.timeout
                 )
             response.raise_for_status()
+
+            # Check if Kroki returned an error image (PNG with error text)
+            if output_format == "png" and response.content.startswith(b"\x89PNG"):
+                # Try to extract error message from PNG content
+                content_str = response.content.decode("utf-8", errors="ignore")
+                if any(
+                    error_word in content_str
+                    for error_word in ["error", "invalid", "syntax", "failed"]
+                ):
+                    # Extract readable error message
+                    lines = content_str.split("\n")
+                    error_lines = [
+                        line.strip()
+                        for line in lines
+                        if line.strip() and len(line.strip()) > 3
+                    ]
+                    if error_lines:
+                        error_msg = error_lines[0][
+                            :100
+                        ]  # First meaningful line, truncated
+                        raise KrokiError(f"Diagram generation failed: {error_msg}")
+                    else:
+                        raise KrokiError(
+                            "Diagram generation failed - invalid diagram syntax"
+                        )
 
             content_type = (
                 f"image/{output_format}" if output_format != "svg" else "image/svg+xml"

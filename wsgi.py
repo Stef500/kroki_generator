@@ -2,7 +2,7 @@
 
 from src.main import create_app
 
-app = create_app('production')
+app = create_app("production")
 
 if __name__ == "__main__":
     app.run()
