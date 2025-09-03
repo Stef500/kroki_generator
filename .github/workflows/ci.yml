@@ -47,7 +47,7 @@ jobs:
 
     - name: Run unit tests
       run: |
-        uv run pytest --cov=src --cov-report=term-missing --cov-report=json --maxfail=1 tests/
+        uv run pytest --cov=src --cov-report=term-missing --cov-report=json --maxfail=1 -m "not integration" tests/
 
     - name: Coverage check
       run: |
@@ -61,17 +61,8 @@ jobs:
             exit(1)
         "
 
-    - name: Run integration tests (optional)
-      continue-on-error: true
-      run: |
-        # Quick integration test without full docker compose
-        docker run --rm -d -p 8080:8080 --name integration-test \
-          -e KROKI_URL=http://kroki.io \
-          python:3.12-slim \
-          sh -c "pip install -q requests flask && python -c 'from flask import Flask; app = Flask(__name__); app.run(host=\"0.0.0.0\", port=8080)'" &
-        sleep 5
-        uv run pytest -x -m integration tests/test_integration.py || true
-        docker stop integration-test || true
+    # Integration tests are excluded from CI and run only in local environment
+    # Use 'docker compose up --build && uv run pytest -m integration' for full integration testing
 
   docker-debug:
     runs-on: ubuntu-latest

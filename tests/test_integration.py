@@ -6,6 +6,9 @@ import time
 import json
 
 
+pytestmark = pytest.mark.integration
+
+
 class TestDockerIntegration:
     """Integration tests for Docker-deployed services."""
 
