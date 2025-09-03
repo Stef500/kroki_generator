@@ -120,11 +120,20 @@
   - SeqDiag, ActDiag, BPMN  
   - **Priorité**: BlockDiag, Excalidraw (plus demandés)
 
-### UX améliorée (1.5h)  
-- [ ] Exemples rapides pré-chargés (0.5h)
-  - Templates Mermaid/PlantUML cliquables
-- [ ] Drag&drop fichier → auto-génération (0.5h)
-- [ ] Historique session in-memory (0.5h)
-  - Derniers 5 diagrammes générés
+### UX améliorée (1.5h) ✅ COMPLETED
+- [x] Exemples rapides pré-chargés (0.5h) ✅
+  - Templates Mermaid/PlantUML/Graphviz/BlockDiag/Excalidraw/Ditaa cliquables
+  - Boutons "Use" avec auto-remplissage du formulaire
+  - Détection automatique du type de diagramme
+- [x] Drag&drop fichier → auto-génération (0.5h) ✅
+  - Zone de drop interactive avec styles visuels
+  - Support fichiers .txt, .md, .puml, .dot, .mmd, .plantuml
+  - Auto-détection du type depuis le nom de fichier
+  - Validation de taille (max 1MB)
+- [x] Historique session in-memory (0.5h) ✅
+  - Derniers 5 diagrammes en localStorage
+  - Interface clickable pour recharger les anciens diagrammes
+  - Timestamps et aperçus des sources
+  - Bouton "Clear" pour vider l'historique
 
 **DoD** : Features stables + docs README à jour + zéro régression MVP.

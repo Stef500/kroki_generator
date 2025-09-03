@@ -34,7 +34,7 @@ dev: ## Start everything for development (Flask + Kroki)
 	@echo "Waiting for Kroki to be ready..."
 	@sleep 3
 	@echo "Starting Flask application..."
-	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
+	PYTHONPATH=. FLASK_PORT=5001 uv run python src/main.py
 
 run: ## Run Flask only (requires Kroki separately)
 	PYTHONPATH=. FLASK_PORT=5001 python src/main.py
@@ -42,15 +42,15 @@ run: ## Run Flask only (requires Kroki separately)
 # === QUALITÉ ===
 
 test: ## Run all tests with coverage
-	pytest tests/ -v --cov=src --cov-report=term-missing
+	uv run pytest tests/ -v --cov=src --cov-report=term-missing
 
 lint: ## Check code quality
-	black --check src tests
-	ruff check src tests
+	uv run black --check src tests
+	uv run ruff check src tests
 
 format: ## Auto-format code
-	black src tests
-	ruff check --fix src tests
+	uv run black src tests
+	uv run ruff check --fix src tests
 
 # === PRODUCTION ===
 

@@ -56,6 +56,18 @@
                     
                     <div class="mb-3">
                         <label for="diagram_source" class="form-label">Diagram Source</label>
+                        
+                        <!-- Drop zone for file upload -->
+                        <div class="drop-zone mb-2" id="dropZone">
+                            <p class="mb-0">
+                                <i class="bi bi-cloud-upload"></i>
+                                Drag &amp; drop a diagram file here or 
+                                <span class="text-primary" style="text-decoration: underline;">browse files</span>
+                            </p>
+                            <small class="text-muted">Supported: .txt, .md, .puml, .dot files</small>
+                            <input type="file" id="fileInput" class="d-none" accept=".txt,.md,.puml,.dot,.mmd,.plantuml">
+                        </div>
+                        
                         <textarea class="form-control" id="diagram_source" name="diagram_source" 
                                   rows="10" placeholder="Enter your diagram source code here..." required></textarea>
                     </div>
@@ -84,6 +96,21 @@
                 <div id="error" class="alert alert-danger mt-3" style="display: none;"></div>
             </div>
         </div>
+        
+        <!-- Session History -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">Recent Diagrams</h6>
+                <button id="clearHistoryBtn" class="btn btn-sm btn-outline-danger" style="display: none;">
+                    Clear
+                </button>
+            </div>
+            <div class="card-body p-2">
+                <div id="diagramHistory" class="small">
+                    <p class="text-muted text-center mb-0">No recent diagrams</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -94,55 +121,92 @@
                 <h5 class="card-title mb-0">Examples</h5>
             </div>
             <div class="card-body">
+                <p class="text-muted mb-3">Click on any example below to auto-fill the form:</p>
                 <div class="row">
                     <div class="col-md-4">
-                        <h6>Mermaid</h6>
-                        <pre class="bg-light p-2 small"><code>graph TD
-    A[Start] --> B{Decision}
-    B -->|Yes| C[Action 1]
-    B -->|No| D[Action 2]</code></pre>
+                        <div class="example-template" data-type="mermaid" data-format="png" 
+                             data-source="graph TD&#10;    A[Start] --&gt; B{Decision}&#10;    B --&gt;|Yes| C[Action 1]&#10;    B --&gt;|No| D[Action 2]">
+                            <h6 class="d-flex justify-content-between align-items-center">
+                                Mermaid
+                                <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
+                            </h6>
+                            <pre class="bg-light p-2 small"><code>graph TD
+    A[Start] --&gt; B{Decision}
+    B --&gt;|Yes| C[Action 1]
+    B --&gt;|No| D[Action 2]</code></pre>
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <h6>PlantUML</h6>
-                        <pre class="bg-light p-2 small"><code>@startuml
-Alice -> Bob: Hello
-Bob -> Alice: Hi there!
+                        <div class="example-template" data-type="plantuml" data-format="png"
+                             data-source="@startuml&#10;Alice -&gt; Bob: Hello&#10;Bob -&gt; Alice: Hi there!&#10;@enduml">
+                            <h6 class="d-flex justify-content-between align-items-center">
+                                PlantUML
+                                <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
+                            </h6>
+                            <pre class="bg-light p-2 small"><code>@startuml
+Alice -&gt; Bob: Hello
+Bob -&gt; Alice: Hi there!
 @enduml</code></pre>
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <h6>Graphviz</h6>
-                        <pre class="bg-light p-2 small"><code>digraph G {
-    A -> B -> C;
-    B -> D;
+                        <div class="example-template" data-type="graphviz" data-format="png"
+                             data-source="digraph G {&#10;    A -&gt; B -&gt; C;&#10;    B -&gt; D;&#10;}">
+                            <h6 class="d-flex justify-content-between align-items-center">
+                                Graphviz
+                                <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
+                            </h6>
+                            <pre class="bg-light p-2 small"><code>digraph G {
+    A -&gt; B -&gt; C;
+    B -&gt; D;
 }</code></pre>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="row mt-3">
                     <div class="col-md-4">
-                        <h6>BlockDiag</h6>
-                        <pre class="bg-light p-2 small"><code>blockdiag {
-    A -> B -> C;
-    B -> D;
+                        <div class="example-template" data-type="blockdiag" data-format="png"
+                             data-source="blockdiag {&#10;    A -&gt; B -&gt; C;&#10;    B -&gt; D;&#10;}">
+                            <h6 class="d-flex justify-content-between align-items-center">
+                                BlockDiag
+                                <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
+                            </h6>
+                            <pre class="bg-light p-2 small"><code>blockdiag {
+    A -&gt; B -&gt; C;
+    B -&gt; D;
 }</code></pre>
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <h6>Excalidraw</h6>
-                        <pre class="bg-light p-2 small"><code>{
+                        <div class="example-template" data-type="excalidraw" data-format="png"
+                             data-source="{&#10;  &quot;type&quot;: &quot;excalidraw&quot;,&#10;  &quot;elements&quot;: [&#10;    {&quot;type&quot;: &quot;rectangle&quot;, &quot;x&quot;: 100, &quot;y&quot;: 100},&#10;    {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;Sample&quot;}&#10;  ]&#10;}">
+                            <h6 class="d-flex justify-content-between align-items-center">
+                                Excalidraw
+                                <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
+                            </h6>
+                            <pre class="bg-light p-2 small"><code>{
   "type": "excalidraw",
   "elements": [
     {"type": "rectangle", "x": 100, "y": 100},
     {"type": "text", "text": "Sample"}
   ]
 }</code></pre>
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <h6>Ditaa</h6>
-                        <pre class="bg-light p-2 small"><code>+--------+   +-------+
+                        <div class="example-template" data-type="ditaa" data-format="png"
+                             data-source="+--------+   +-------+&#10;|  cRED  |   | cBLU  |&#10;| Client +---+ Server|&#10;|     {d}|   |    {s}|&#10;+--------+   +-------+">
+                            <h6 class="d-flex justify-content-between align-items-center">
+                                Ditaa
+                                <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
+                            </h6>
+                            <pre class="bg-light p-2 small"><code>+--------+   +-------+
 |  cRED  |   | cBLU  |
 | Client +---+ Server|
 |     {d}|   |    {s}|
 +--------+   +-------+</code></pre>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -153,6 +217,177 @@ Bob -> Alice: Hi there!
 
 {% block scripts %}
 <script>
+// Session history management
+const HISTORY_KEY = 'kroki_diagram_history';
+const MAX_HISTORY = 5;
+
+// Load history from localStorage
+function loadHistory() {
+    try {
+        return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    } catch {
+        return [];
+    }
+}
+
+// Save history to localStorage
+function saveHistory(history) {
+    try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch (e) {
+        console.warn('Could not save to localStorage:', e);
+    }
+}
+
+// Add item to history
+function addToHistory(item) {
+    const history = loadHistory();
+    history.unshift(item);
+    if (history.length > MAX_HISTORY) {
+        history.splice(MAX_HISTORY);
+    }
+    saveHistory(history);
+    renderHistory();
+}
+
+// Render history UI
+function renderHistory() {
+    const history = loadHistory();
+    const historyDiv = document.getElementById('diagramHistory');
+    const clearBtn = document.getElementById('clearHistoryBtn');
+    
+    if (history.length === 0) {
+        historyDiv.innerHTML = '<p class="text-muted text-center mb-0">No recent diagrams</p>';
+        clearBtn.style.display = 'none';
+        return;
+    }
+    
+    clearBtn.style.display = 'inline-block';
+    
+    const historyHtml = history.map((item, index) => `
+        <div class="history-item" data-index="${index}">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-primary">${item.type} • ${item.format}</span>
+                <small class="text-muted">${new Date(item.timestamp).toLocaleTimeString()}</small>
+            </div>
+            <div class="text-truncate small text-muted" style="max-width: 200px;">
+                ${item.source.substring(0, 50)}...
+            </div>
+        </div>
+    `).join('');
+    
+    historyDiv.innerHTML = historyHtml;
+    
+    // Add click handlers
+    historyDiv.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            const historyItem = history[index];
+            
+            document.getElementById('diagram_type').value = historyItem.type;
+            document.getElementById('output_format').value = historyItem.format;
+            document.getElementById('diagram_source').value = historyItem.source;
+        });
+    });
+}
+
+// Template click handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Render initial history
+    renderHistory();
+    
+    // Template buttons
+    document.querySelectorAll('.use-template-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const template = this.closest('.example-template');
+            
+            document.getElementById('diagram_type').value = template.dataset.type;
+            document.getElementById('output_format').value = template.dataset.format;
+            document.getElementById('diagram_source').value = template.dataset.source.replace(/&#10;/g, '
+').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&quot;/g, '"');
+            
+            // Scroll to form
+            document.getElementById('diagramForm').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+    
+    // Clear history button
+    document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+        if (confirm('Clear all diagram history?')) {
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+        }
+    });
+    
+    // Drag & Drop functionality
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const diagramSource = document.getElementById('diagram_source');
+    
+    // Make drop zone clickable
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    // Drag & Drop events
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        if (this.files.length > 0) {
+            handleFile(this.files[0]);
+        }
+    });
+    
+    // Handle file reading
+    function handleFile(file) {
+        if (file.size > 1000000) { // 1MB limit
+            alert('File too large. Maximum size is 1MB.');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            diagramSource.value = e.target.result;
+            
+            // Auto-detect diagram type from filename
+            const filename = file.name.toLowerCase();
+            const diagramTypeSelect = document.getElementById('diagram_type');
+            
+            if (filename.includes('mermaid') || filename.endsWith('.mmd')) {
+                diagramTypeSelect.value = 'mermaid';
+            } else if (filename.includes('plantuml') || filename.endsWith('.puml') || filename.endsWith('.plantuml')) {
+                diagramTypeSelect.value = 'plantuml';
+            } else if (filename.includes('graphviz') || filename.endsWith('.dot')) {
+                diagramTypeSelect.value = 'graphviz';
+            } else if (filename.includes('blockdiag')) {
+                diagramTypeSelect.value = 'blockdiag';
+            } else if (filename.includes('ditaa')) {
+                diagramTypeSelect.value = 'ditaa';
+            }
+        };
+        reader.readAsText(file);
+    }
+});
+
+// Form submission with history
 document.getElementById('diagramForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -213,6 +448,14 @@ document.getElementById('diagramForm').addEventListener('submit', async function
             a.download = `diagram.${data.output_format}`;
             a.click();
         };
+        
+        // Add to history on success
+        addToHistory({
+            type: data.diagram_type,
+            format: data.output_format,
+            source: data.diagram_source,
+            timestamp: new Date().toISOString()
+        });
         
     } catch (err) {
         error.textContent = err.message;

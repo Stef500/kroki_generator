@@ -5,6 +5,7 @@ A Flask web application that provides a simple interface for generating diagrams
 ## ✨ Features
 
 - **Web Interface**: Clean, responsive UI for diagram generation
+- **Enhanced UX**: Quick-use templates, drag & drop file support, session history
 - **Multiple Formats**: Support for Mermaid, PlantUML, Graphviz, BlockDiag, Excalidraw, Ditaa, SeqDiag, ActDiag, and BPMN diagrams
 - **Flexible Output**: Generate PNG or SVG images
 - **REST API**: HTTP API for programmatic diagram generation
