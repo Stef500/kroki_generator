@@ -130,6 +130,16 @@ jobs:
 
     - name: Test Docker image
       run: |
+        # Add retry logic for DockerHub availability
+        for i in {1..3}; do
+          echo "Attempt $i: Pulling image..."
+          if docker pull ${{ secrets.DOCKERHUB_USERNAME }}/kroki-flask-generator:latest; then
+            break
+          fi
+          echo "Pull failed, waiting 30 seconds..."
+          sleep 30
+        done
+        
         docker run --rm -d -p 8080:8080 --name test-app ${{ secrets.DOCKERHUB_USERNAME }}/kroki-flask-generator:latest
         sleep 15
         curl -f http://localhost:8080/health || exit 1
