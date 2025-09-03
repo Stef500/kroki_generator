@@ -206,7 +206,10 @@ class TestRoutes:
             ("ditaa", "+--------+\n|  Test  |\n+--------+"),
             ("seqdiag", "seqdiag {\n  A -> B -> C;\n}"),
             ("actdiag", "actdiag {\n  A -> B -> C;\n}"),
-            ("bpmn", '<?xml version="1.0" encoding="UTF-8"?><definitions></definitions>')
+            (
+                "bpmn",
+                '<?xml version="1.0" encoding="UTF-8"?><definitions></definitions>',
+            ),
         ]
 
         for diagram_type, source in new_types:
@@ -214,7 +217,7 @@ class TestRoutes:
                 "/api/generate",
                 json={
                     "diagram_type": diagram_type,
-                    "output_format": "png", 
+                    "output_format": "png",
                     "diagram_source": source,
                 },
                 content_type="application/json",

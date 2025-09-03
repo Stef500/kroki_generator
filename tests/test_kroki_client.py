@@ -53,10 +53,10 @@ class TestKrokiClient:
         source = """blockdiag {
   A -> B -> C;
 }"""
-        
+
         for diagram_type in ["blockdiag", "seqdiag", "actdiag"]:
             result = self.client._preprocess_blockdiag_family(diagram_type, source)
-            
+
             # Should add styling
             assert "default_node_color = lightblue;" in result
             assert "default_linecolor = black;" in result
@@ -68,7 +68,7 @@ class TestKrokiClient:
         """Test preprocessing for ditaa diagrams."""
         source = "+--------+\n|  Test  |\n+--------+"
         result = self.client._preprocess_ditaa(source)
-        
+
         # Ditaa doesn't need preprocessing, should return unchanged
         assert result == source
 
@@ -202,11 +202,9 @@ class TestKrokiClient:
         assert content_type == "image/svg+xml"
 
     def test_generate_new_diagram_types_ditaa(self, requests_mock):
-        """Test successful Ditaa diagram generation.""" 
+        """Test successful Ditaa diagram generation."""
         mock_image_data = b"fake-ditaa-png"
-        requests_mock.post(
-            "http://test-kroki:8000/ditaa/png", content=mock_image_data
-        )
+        requests_mock.post("http://test-kroki:8000/ditaa/png", content=mock_image_data)
 
         ditaa_source = "+--------+\n|  Test  |\n+--------+"
         result_data, content_type = self.client.generate_diagram(

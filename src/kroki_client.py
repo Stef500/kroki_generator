@@ -144,7 +144,7 @@ class KrokiClient:
         """Prétraite le code source du diagramme pour appliquer les thèmes et le styling.
 
         Args:
-            diagram_type: Type de diagramme (mermaid, plantuml, graphviz, blockdiag, 
+            diagram_type: Type de diagramme (mermaid, plantuml, graphviz, blockdiag,
                          excalidraw, ditaa, seqdiag, actdiag, bpmn)
             diagram_source: Code source original du diagramme
 
@@ -239,8 +239,8 @@ class KrokiClient:
             str: Code source avec paramètres de style ajoutés si nécessaire
         """
         # Add default styling if not present
-        lines = source.strip().split('\n')
-        if lines and not any('default_' in line for line in lines[:5]):
+        lines = source.strip().split("\n")
+        if lines and not any("default_" in line for line in lines[:5]):
             # Add styling options
             style_lines = [
                 "    default_node_color = lightblue;",
@@ -248,22 +248,22 @@ class KrokiClient:
                 "    default_textcolor = black;",
                 "    node_width = 128;",
                 "    node_height = 40;",
-                "    default_shape = box;"
+                "    default_shape = box;",
             ]
-            
+
             # Insert after opening brace if present
-            if lines and '{' in lines[0]:
+            if lines and "{" in lines[0]:
                 lines = lines[:1] + style_lines + lines[1:]
             else:
                 # Insert at beginning
                 lines = style_lines + lines
-                
-        return '\n'.join(lines)
+
+        return "\n".join(lines)
 
     def _preprocess_ditaa(self, source: str) -> str:
         """Prétraite les diagrammes Ditaa pour un styling cohérent.
 
-        Ditaa est un outil de diagrammes ASCII art qui convertit les 
+        Ditaa est un outil de diagrammes ASCII art qui convertit les
         diagrammes texte en images. Pas de preprocessing spécifique nécessaire.
 
         Args:
@@ -287,7 +287,17 @@ class KrokiClient:
         Raises:
             KrokiError: Si l'un des paramètres est invalide
         """
-        valid_types = ["mermaid", "plantuml", "graphviz", "blockdiag", "excalidraw", "ditaa", "seqdiag", "actdiag", "bpmn"]
+        valid_types = [
+            "mermaid",
+            "plantuml",
+            "graphviz",
+            "blockdiag",
+            "excalidraw",
+            "ditaa",
+            "seqdiag",
+            "actdiag",
+            "bpmn",
+        ]
         valid_formats = ["png", "svg"]
 
         if diagram_type not in valid_types:
