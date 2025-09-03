@@ -316,8 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.getElementById('diagram_type').value = template.dataset.type;
             document.getElementById('output_format').value = template.dataset.format;
-            document.getElementById('diagram_source').value = template.dataset.source.replace(/&#10;/g, '
-').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&quot;/g, '"');
+            document.getElementById('diagram_source').value = template.dataset.source.replace(/&#10;/g, '\n').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&quot;/g, '"');
             
             // Scroll to form
             document.getElementById('diagramForm').scrollIntoView({ behavior: 'smooth' });
