@@ -1,10 +1,15 @@
 # Multi-stage build for production Flask app
 FROM python:3.12-slim AS builder
 
-# Install build dependencies
+# Install build dependencies and uv
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    && rm -rf /var/lib/apt/lists/*
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Add uv to PATH
+ENV PATH="/root/.cargo/bin:$PATH"
 
 # Set work directory
 WORKDIR /app
@@ -12,9 +17,8 @@ WORKDIR /app
 # Copy requirements
 COPY pyproject.toml ./
 
-# Install dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -e .
+# Install dependencies with uv (much faster than pip)
+RUN uv sync --no-dev --frozen
 
 # Production stage
 FROM python:3.12-slim AS production
