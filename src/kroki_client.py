@@ -274,8 +274,6 @@ class KrokiClient:
         """
         return source
 
-
-
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
     ) -> None:

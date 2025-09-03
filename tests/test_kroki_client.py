@@ -72,8 +72,6 @@ class TestKrokiClient:
         # Ditaa doesn't need preprocessing, should return unchanged
         assert result == source
 
-
-
     def test_generate_diagram_success_png(self, requests_mock):
         """Test successful PNG diagram generation."""
         mock_image_data = b"fake-png-data"
