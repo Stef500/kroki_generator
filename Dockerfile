@@ -17,9 +17,9 @@ WORKDIR /app
 # Copy requirements
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies with uv (much faster than pip)
-# Use --system to install directly into system Python, not venv
-RUN uv sync --no-dev --frozen --system
+# Install dependencies with uv (export lockfile then install with pip)
+RUN uv export --no-dev --format requirements.txt > requirements.txt && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Production stage
 FROM python:3.12-slim AS production
