@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @main_bp.route("/", methods=["GET", "POST"])
 def index() -> Union[str, Response]:
     """Render main page with diagram generation form.
-    
+
     Handles both GET (normal page load) and POST (fallback form submission).
 
     Returns:
@@ -27,25 +27,28 @@ def index() -> Union[str, Response]:
         try:
             # Get form data
             diagram_type = request.form.get("diagram_type")
-            output_format = request.form.get("output_format") 
+            output_format = request.form.get("output_format")
             diagram_source = request.form.get("diagram_source")
             diagram_theme = request.form.get("diagram_theme")
-            
+
             # Validate required fields
             if not all([diagram_type, output_format, diagram_source]):
-                return render_template("index.html", 
+                return render_template(
+                    "index.html",
                     error="Please fill in all required fields",
-                    form_data=request.form)
-            
+                    form_data=request.form,
+                )
+
             # Generate diagram using the same logic as API
             kroki_client = KrokiClient()
-            
+
             # Set theme if provided
             if diagram_theme:
                 from flask import current_app
+
                 original_theme = current_app.config.get("DIAGRAM_THEME")
                 current_app.config["DIAGRAM_THEME"] = diagram_theme
-                
+
             try:
                 image_data, content_type = kroki_client.generate_diagram(
                     diagram_type=diagram_type,
@@ -54,9 +57,13 @@ def index() -> Union[str, Response]:
                 )
             finally:
                 # Restore original theme
-                if diagram_theme and 'original_theme' in locals() and original_theme is not None:
+                if (
+                    diagram_theme
+                    and "original_theme" in locals()
+                    and original_theme is not None
+                ):
                     current_app.config["DIAGRAM_THEME"] = original_theme
-            
+
             # Return binary response
             filename = f"diagram.{output_format}"
             response = Response(
@@ -69,18 +76,20 @@ def index() -> Union[str, Response]:
             )
             logger.info(f"Generated {diagram_type} diagram via fallback form")
             return response
-            
+
         except KrokiError as e:
             logger.warning(f"Kroki error in fallback: {str(e)}")
-            return render_template("index.html", 
+            return render_template(
+                "index.html",
                 error=f"Diagram generation failed: {str(e)}",
-                form_data=request.form)
+                form_data=request.form,
+            )
         except Exception as e:
             logger.error(f"Unexpected error in fallback: {str(e)}")
-            return render_template("index.html", 
-                error=f"Internal error: {str(e)}",
-                form_data=request.form)
-    
+            return render_template(
+                "index.html", error=f"Internal error: {str(e)}", form_data=request.form
+            )
+
     # GET request - normal page load
     return render_template("index.html")
 
