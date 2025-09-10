@@ -7,6 +7,7 @@ formats de sortie et fonctionnalités avancées comme les thèmes.
 
 import tempfile
 import requests
+import json
 from typing import Tuple, Optional
 from flask import current_app
 
@@ -159,7 +160,9 @@ class KrokiClient:
             return self._preprocess_blockdiag_family(diagram_type, diagram_source)
         elif diagram_type == "ditaa":
             return self._preprocess_ditaa(diagram_source)
-        # excalidraw and bpmn don't need preprocessing
+        elif diagram_type == "excalidraw":
+            return self._preprocess_excalidraw(diagram_source)
+        # bpmn doesn't need preprocessing
         return diagram_source
 
     def _preprocess_mermaid(self, source: str) -> str:
@@ -273,6 +276,51 @@ class KrokiClient:
             str: Code source inchangé (Ditaa n'a pas besoin de preprocessing)
         """
         return source
+
+    def _preprocess_excalidraw(self, source: str) -> str:
+        """Nettoie et prétraite les diagrammes Excalidraw.
+
+        Supprime la section 'files' contenant les données d'images base64
+        qui ne sont pas supportées par Kroki. Conserve uniquement les
+        éléments essentiels : type, version, source, elements, appState.
+
+        Args:
+            source: Code source Excalidraw original (JSON complet d'export)
+
+        Returns:
+            str: Code source nettoyé compatible avec Kroki
+
+        Raises:
+            KrokiError: Si le JSON est malformé et ne peut pas être parsé
+        """
+        try:
+            # Tentative de parsing du JSON
+            data = json.loads(source.strip())
+
+            # Vérifier que c'est bien un JSON Excalidraw
+            if not isinstance(data, dict) or data.get("type") != "excalidraw":
+                return source  # Pas un JSON Excalidraw, retourner tel quel
+
+            # Créer un JSON nettoyé avec seulement les clés essentielles
+            cleaned_data = {
+                "type": data.get("type", "excalidraw"),
+                "version": data.get("version", 2),
+                "source": data.get("source", "https://excalidraw.com"),
+                "elements": data.get("elements", []),
+                "appState": data.get(
+                    "appState", {"viewBackgroundColor": "#ffffff", "gridSize": 20}
+                ),
+            }
+
+            # Retourner le JSON nettoyé
+            return json.dumps(cleaned_data, separators=(",", ":"))
+
+        except json.JSONDecodeError as e:
+            # Le source n'est pas un JSON valide
+            raise KrokiError(f"Invalid Excalidraw JSON format: {str(e)}")
+        except Exception as e:
+            # Autres erreurs de traitement
+            raise KrokiError(f"Error processing Excalidraw diagram: {str(e)}")
 
     def _validate_inputs(
         self, diagram_type: str, output_format: str, diagram_source: str
