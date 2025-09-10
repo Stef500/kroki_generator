@@ -58,12 +58,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <label for="diagram_source" class="form-label">Diagram Source</label>
-                            <button type="button" id="clearSourceBtn" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-x-circle"></i> Clear
-                            </button>
-                        </div>
+                        <label for="diagram_source" class="form-label">Diagram Source</label>
                         
                         <!-- Drop zone for file upload -->
                         <div class="drop-zone mb-2" id="dropZone">
@@ -450,6 +445,10 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('diagram_type').value = template.dataset.type;
             document.getElementById('output_format').value = template.dataset.format;
             document.getElementById('diagram_source').value = template.dataset.source.replace(/&#10;/g, '\n').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&quot;/g, '"');
+            
+            // Update field states after setting values
+            updateThemeFieldState();
+            updateOutputFormatState();
             
             // Scroll to form
             document.getElementById('diagramForm').scrollIntoView({ behavior: 'smooth' });
