@@ -437,8 +437,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear source button handler
     document.getElementById('clearSourceBtn').addEventListener('click', function() {
         const diagramSource = document.getElementById('diagram_source');
+        const result = document.getElementById('result');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const error = document.getElementById('error');
+        
+        // Clear diagram source
         diagramSource.value = '';
         diagramSource.focus();
+        
+        // Clear result window
+        result.innerHTML = '<p class="text-muted">Generated diagram will appear here</p>';
+        
+        // Hide download button and error messages
+        downloadBtn.style.display = 'none';
+        error.style.display = 'none';
     });
     
     // Template buttons
