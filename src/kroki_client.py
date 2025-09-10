@@ -133,7 +133,19 @@ class KrokiClient:
             raise KrokiError("Connection error - Cannot reach Kroki service")
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 400:
-                raise KrokiError(f"Invalid diagram syntax: {e.response.text}")
+                # Check if the response is actually a valid image (PNG/SVG)
+                content = e.response.content
+                if (output_format == "png" and content.startswith(b"\x89PNG")) or \
+                   (output_format == "svg" and b"<svg" in content[:100]):
+                    # This is actually a successful generation, return it
+                    content_type = (
+                        f"image/{output_format}" if output_format != "svg" else "image/svg+xml"
+                    )
+                    return content, content_type
+                else:
+                    # This is a real error
+                    error_text = e.response.text[:200] if e.response.text else "Unknown error"
+                    raise KrokiError(f"Invalid diagram syntax: {error_text}")
             elif e.response.status_code >= 500:
                 raise KrokiError("Kroki service error - Please try again later")
             else:
