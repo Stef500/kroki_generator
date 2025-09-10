@@ -374,6 +374,52 @@ document.addEventListener('DOMContentLoaded', function() {
     // Render initial history
     renderHistory();
     
+    // Handle diagram theme field state
+    const diagramTypeSelect = document.getElementById('diagram_type');
+    const diagramThemeSelect = document.getElementById('diagram_theme');
+    const outputFormatSelect = document.getElementById('output_format');
+    
+    function updateThemeFieldState() {
+        const selectedType = diagramTypeSelect.value;
+        if (selectedType === 'graphviz') {
+            diagramThemeSelect.disabled = false;
+            diagramThemeSelect.style.opacity = '1';
+        } else {
+            diagramThemeSelect.disabled = true;
+            diagramThemeSelect.style.opacity = '0.6';
+            diagramThemeSelect.value = 'light'; // Reset to default
+        }
+    }
+    
+    function updateOutputFormatState() {
+        const selectedType = diagramTypeSelect.value;
+        const pngOption = outputFormatSelect.querySelector('option[value="png"]');
+        
+        if (selectedType === 'excalidraw') {
+            // Disable PNG for Excalidraw
+            pngOption.disabled = true;
+            pngOption.style.color = '#6c757d';
+            // Switch to SVG if PNG was selected
+            if (outputFormatSelect.value === 'png') {
+                outputFormatSelect.value = 'svg';
+            }
+        } else {
+            // Enable PNG for other diagram types
+            pngOption.disabled = false;
+            pngOption.style.color = '';
+        }
+    }
+    
+    // Initial state
+    updateThemeFieldState();
+    updateOutputFormatState();
+    
+    // Listen for diagram type changes
+    diagramTypeSelect.addEventListener('change', function() {
+        updateThemeFieldState();
+        updateOutputFormatState();
+    });
+    
     // Template buttons
     document.querySelectorAll('.use-template-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
