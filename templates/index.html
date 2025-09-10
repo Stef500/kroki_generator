@@ -206,7 +206,8 @@ Bob -&gt; Alice: Hi there!
                                 Excalidraw
                                 <button type="button" class="btn btn-sm btn-outline-primary use-template-btn">Use</button>
                             </h6>
-                            <pre class="bg-light p-2 small"><code>{
+                            <div class="collapsible-code-wrapper">
+                                <pre class="bg-light p-2 small"><code>{
   "type": "excalidraw",
   "version": 2,
   "source": "https://excalidraw.com",
@@ -279,6 +280,10 @@ Bob -&gt; Alice: Hi there!
   },
   "files": {}
 }</code></pre>
+                            </div>
+                            <button type="button" class="expand-toggle-btn" onclick="toggleExcalidrawTemplate(this)">
+                                ▼ Show more
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -454,7 +459,23 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('diagramForm').scrollIntoView({ behavior: 'smooth' });
         });
     });
+});
+
+// Excalidraw template toggle function
+function toggleExcalidrawTemplate(button) {
+    const wrapper = button.previousElementSibling;
+    const isExpanded = wrapper.classList.contains('expanded');
     
+    if (isExpanded) {
+        wrapper.classList.remove('expanded');
+        button.innerHTML = '▼ Show more';
+    } else {
+        wrapper.classList.add('expanded');
+        button.innerHTML = '▲ Show less';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
     // Clear history button
     document.getElementById('clearHistoryBtn').addEventListener('click', function() {
         if (confirm('Clear all diagram history?')) {

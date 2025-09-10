@@ -169,6 +169,50 @@
         .text-muted {
             color: var(--input-text) !important;
         }
+        
+        /* Collapsible template functionality */
+        .collapsible-code-wrapper {
+            position: relative;
+            max-height: 120px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-code-wrapper.expanded {
+            max-height: none;
+        }
+        
+        .collapsible-code-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(transparent, var(--code-bg));
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .collapsible-code-wrapper.expanded::after {
+            opacity: 0;
+        }
+        
+        .expand-toggle-btn {
+            margin-top: 5px;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            border: none;
+            background: var(--button-secondary);
+            color: white;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+        
+        .expand-toggle-btn:hover {
+            background: var(--button-primary);
+        }
     </style>
 </head>
 <body>
