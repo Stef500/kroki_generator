@@ -177,4 +177,4 @@ Desktop.ini
 # Serena
 .serena/cache
 /coverage.json
-/tmp/docker-compose.yml
+/tmp
