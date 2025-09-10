@@ -58,7 +58,12 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="diagram_source" class="form-label">Diagram Source</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="diagram_source" class="form-label">Diagram Source</label>
+                            <button type="button" id="clearSourceBtn" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Clear
+                            </button>
+                        </div>
                         
                         <!-- Drop zone for file upload -->
                         <div class="drop-zone mb-2" id="dropZone">
@@ -76,10 +81,19 @@
                     </div>
                     
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
-                            Generate Diagram
-                        </button>
+                        <div class="row">
+                            <div class="col-8">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Generate Diagram
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" id="clearSourceBtn" class="btn btn-outline-secondary w-100">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
                         <small class="text-muted text-center">
                             If the diagram doesn't appear, try disabling JavaScript or 
                             <button type="button" id="fallbackBtn" class="btn btn-link btn-sm p-0">use fallback mode</button>
@@ -381,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateThemeFieldState() {
         const selectedType = diagramTypeSelect.value;
-        if (selectedType === 'graphviz') {
+        if (selectedType === 'mermaid') {
             diagramThemeSelect.disabled = false;
             diagramThemeSelect.style.opacity = '1';
         } else {
@@ -418,6 +432,13 @@ document.addEventListener('DOMContentLoaded', function() {
     diagramTypeSelect.addEventListener('change', function() {
         updateThemeFieldState();
         updateOutputFormatState();
+    });
+    
+    // Clear source button handler
+    document.getElementById('clearSourceBtn').addEventListener('click', function() {
+        const diagramSource = document.getElementById('diagram_source');
+        diagramSource.value = '';
+        diagramSource.focus();
     });
     
     // Template buttons
