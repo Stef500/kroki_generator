@@ -390,28 +390,8 @@ class KrokiClient:
         )
         response.raise_for_status()
 
-        # Check if Kroki returned an error image (PNG with error text)
-        if output_format == "png" and response.content.startswith(b"\x89PNG"):
-            # Try to extract error message from PNG content
-            content_str = response.content.decode("utf-8", errors="ignore")
-            if any(
-                error_word in content_str
-                for error_word in ["error", "invalid", "syntax", "failed"]
-            ):
-                # Extract readable error message
-                lines = content_str.split("\n")
-                error_lines = [
-                    line.strip()
-                    for line in lines
-                    if line.strip() and len(line.strip()) > 3
-                ]
-                if error_lines:
-                    error_msg = error_lines[0][:100]  # First meaningful line, truncated
-                    raise KrokiError(f"Diagram generation failed: {error_msg}")
-                else:
-                    raise KrokiError(
-                        "Diagram generation failed - invalid diagram syntax"
-                    )
+        # If we reach here, the HTTP request was successful (status 200)
+        # The response content is the generated diagram image
 
         content_type = (
             f"image/{output_format}" if output_format != "svg" else "image/svg+xml"
