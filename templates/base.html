@@ -155,8 +155,13 @@
         }
         
         /* Code blocks theme adaptation */
-        pre {
+        pre, .bg-light {
             background-color: var(--code-bg) !important;
+            color: var(--text-color) !important;
+        }
+        
+        /* Specific fix for example templates */
+        .example-template pre code {
             color: var(--text-color) !important;
         }
         
